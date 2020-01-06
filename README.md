@@ -1,8 +1,7 @@
 # compiler
 
-## lexer
-
 ## parser
+### lexer
 ### antlr(or BNF like)
 ### manual parser
 ### combinator
