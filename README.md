@@ -1,21 +1,9 @@
-# compiler
+# Make your own programming language(or why we better don't do that)
+
+An overview
 
 ## parser
-### lexer
-### antlr(or BNF like)
-### manual parser
-### combinator
-
 ## semantic checker
-### lambda calculus
-### type parameter(generic)
-
 ## code generator
-### x86
-### LLVM
-
 ## optimizer
-
 ## runtime
-### GC
-### VM
