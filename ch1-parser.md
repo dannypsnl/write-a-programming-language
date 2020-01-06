@@ -50,7 +50,38 @@ The first one was picked by C family, and second one was using by ML family, bot
 these issues.
 
 ## Simple parser and why we have next section
+
+In this section we would use Antlr to describe syntax and use Antlr as parser generator. Parser can be generated? Sure, but I
+do not recommend it in production. But for simple stuff it was fine.
+
+Here we were going to talk about natural number arithmetic syntax which supprts plus: `+`, times: `*`, minus: `-` and divide: `/`.
+
+```antlr
+expression
+   : expression  (TIMES | DIV)  expression
+   | expression  (PLUS | MINUS) expression
+   | NUMBER
+   ;
+NUMBER : ('0' .. '9')+;
+PLUS : '+';
+MINUS : '-';
+TIMES : '*';
+DIV : '/';
+WS : [ \r\n\t] + -> skip;
+```
+
+This is a very short syntax, even C lanugage syntax has 954 lines: https://github.com/antlr/grammars-v4/blob/master/c/C.g4 , cpp even has 1940 lines: https://github.com/antlr/grammars-v4/blob/master/cpp/CPP14.g4 .
+
+Forget about that, at here code generator was really useful, we can quickly generate the Parser for our purpose:
+
+```
+TODO: antlr commands
+```
+
+TODO: Write an interpreter for arithmetic
+
+TODO: Write a manual arithmetic parser and why we break them down to lexer for token stream.
+
 ## Lexer
-## BNF
 ## Manual parser
 ## Combinator
