@@ -49,3 +49,8 @@ print "hello, " (user_input)
 The first one was picked by C family, and second one was using by ML family, both has cons and pros. We would keep mention
 these issues.
 
+## Simple parser and why we have next section
+## Lexer
+## BNF
+## Manual parser
+## Combinator
