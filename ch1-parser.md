@@ -83,5 +83,28 @@ TODO: Write an interpreter for arithmetic
 TODO: Write a manual arithmetic parser and why we break them down to lexer for token stream.
 
 ## Lexer
+
+Lexer is an optional, the correct way to describe it was a helper component, we would need it when the token was trying to reduce the concept we have to consider. If we don't use lexer, when we parsing
+
+```
+class Foo {}
+```
+
+we could write down:
+
+```
+identifier = take_char_until_one_of([' ', '\n'])
+if identifier == "class"
+   name_of_class = take_char_until_one_of([' ', '\n'])
+   require('{')
+   require('}')
+else
+   // parse different rule
+```
+
+Which was very low-level program, we have to handle each space and newline and remember when we don't need them. For many language we can extract out lexer/tokenizer to do these. The idea was we don't have to directly work with string, but with token, a token could contain `location`, `content`, `type` these information to help parser keep doing the parsing. A lexer can directly skip whitespace and newline, update location information and normalize the content of token(for example we can parse int or parse float before the token sent to parser).
+
+TODO: simple lexer implmentation, with location info
+
 ## Manual parser
 ## Combinator
