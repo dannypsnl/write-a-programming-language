@@ -53,7 +53,7 @@ these issues.
 
 In this section we would use Perl6 to build a parser. Parser can be generated? Sure, but I do not recommend it in production. But for simple stuff it was fine.
 
-Here we were going to talk about natural number arithmetic syntax which supprts plus: `+`, times: `*`, minus: `-` and divide: `/`.
+Here we were going to talk about natural number arithmetic syntax which supprts plus: `+`, times(multiple): `*`, minus: `-` and divide: `/`.
 
 ```perl6
 grammar Calculator {
@@ -64,7 +64,7 @@ grammar Calculator {
           rule calc-op:sym<div> { <num> '/' <num> }
           rule calc-op:sym<add> { <num> '+' <num> }
           rule calc-op:sym<sub> { <num> '-' <num> }
-
+    # just like regex, \d+ is at least one digit
     token num { \d+ }
 }
 ```
@@ -89,7 +89,38 @@ say '2*3 = ' ~ Calculator.parse('2*3', actions => Calculations).made;
 
 This one basically not good enough, it can't handle parentheses, can't handle `2 * 2 + 3`. But anyway shows how interpreter work.
 
-TODO: Write a manual arithmetic parser and why we break them down to lexer for token stream.
+Now consider a manual parser, how would it looks like? It actually easy to build up. Consider the following Java program:
+
+```java
+Scanner s = new Scanner(input);
+StringBuilder number = new StringBuilder("");
+char c = s.next().charAt(0);
+while (Character.isDigit(c)) {
+    number.append(c);
+    c = s.next().charAt(0);
+}
+// now c must not a digit
+while (Character.isSpace(c)) {
+    c = s.next().charAt(0); // skip whitespace
+}
+if (c == '+') {
+    c = s.next().charAt(0);
+} else {
+    throw new SyntaxException("allow + operator only");
+}
+while (Character.isSpace(c)) {
+    c = s.next().charAt(0); // skip whitespace
+}
+StringBuilder number2 = new StringBuilder("");
+char c = s.next().charAt(0);
+while (Character.isDigit(c)) {
+    number2.append(c);
+    c = s.next().charAt(0);
+}
+return new BinaryExpression(number, number2, Operator("+"));
+```
+
+This is of course too exaggerated, but can show why handling input stream is not a good idea. That's why we introduce Lexer layer.
 
 ## Lexer
 
