@@ -51,34 +51,43 @@ these issues.
 
 ## Simple parser and why we have next section
 
-In this section we would use Antlr to describe syntax and use Antlr as parser generator. Parser can be generated? Sure, but I
-do not recommend it in production. But for simple stuff it was fine.
+In this section we would use Perl6 to build a parser. Parser can be generated? Sure, but I do not recommend it in production. But for simple stuff it was fine.
 
 Here we were going to talk about natural number arithmetic syntax which supprts plus: `+`, times: `*`, minus: `-` and divide: `/`.
 
-```antlr
-expression
-   : expression  (TIMES | DIV)  expression
-   | expression  (PLUS | MINUS) expression
-   | NUMBER
-   ;
-NUMBER : ('0' .. '9')+;
-PLUS : '+';
-MINUS : '-';
-TIMES : '*';
-DIV : '/';
-WS : [ \r\n\t] + -> skip;
+```perl6
+grammar Calculator {
+    token TOP { <calc-op> }
+
+    proto rule calc-op          {*}
+          rule calc-op:sym<mult> { <num> '*' <num> }
+          rule calc-op:sym<div> { <num> '/' <num> }
+          rule calc-op:sym<add> { <num> '+' <num> }
+          rule calc-op:sym<sub> { <num> '-' <num> }
+
+    token num { \d+ }
+}
 ```
 
-This is a very short syntax, even C lanugage syntax has 954 lines: https://github.com/antlr/grammars-v4/blob/master/c/C.g4 , cpp even has 1940 lines: https://github.com/antlr/grammars-v4/blob/master/cpp/CPP14.g4 .
+This is a very short syntax, even C lanugage syntax has 954 lines: https://github.com/antlr/grammars-v4/blob/master/c/C.g4 , cpp even has 1940 lines: https://github.com/antlr/grammars-v4/blob/master/cpp/CPP14.g4 in Antlr4(another parser generator).
 
-Forget about that, at here code generator was really useful, we can quickly generate the Parser for our purpose:
+Forget about that, at here code generator was really useful, we can quickly generate the Parser for our purpose. Then we can create an interpreter based on it:
 
+```perl6
+class Calculations {
+    method TOP              ($/) { make $<calc-op>.made; }
+    # if you are not familiar with Perl just like me, notice that `calc-op` mapping to each grammar
+    method calc-op:sym<mult> ($/) { make [*] $<num> }
+    method calc-op:sym<div> ($/) { make [/] $<num> }
+    method calc-op:sym<add> ($/) { make [+] $<num>; }
+    method calc-op:sym<sub> ($/) { make [-] $<num>; }
+}
+
+say '2+2 = ' ~ Calculator.parse('2+2', actions => Calculations).made;
+say '2*3 = ' ~ Calculator.parse('2*3', actions => Calculations).made;
 ```
-TODO: antlr commands
-```
 
-TODO: Write an interpreter for arithmetic
+This one basically not good enough, it can't handle parentheses, can't handle `2 * 2 + 3`. But anyway shows how interpreter work.
 
 TODO: Write a manual arithmetic parser and why we break them down to lexer for token stream.
 
