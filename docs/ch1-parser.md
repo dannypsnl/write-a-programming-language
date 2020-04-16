@@ -147,4 +147,84 @@ Which was very low-level program, we have to handle each space and newline and r
 TODO: simple lexer implmentation, with location info
 
 ## Manual parser
+
+A manual parser is powerful, but on the other hand it takes a lot of effort. Before you jump into writing a manual parser and never go back again, ensure that parser generator cannot handle your case.
+
+Write a manual parser didn't need many parsing background knowledge, surprising, but heavy repetitive work. Because simply porting **LL** syntax can handle about 90% job. For example, an assignment syntax `<type> <name> = <expr>;` can use the following parser:
+
+```py
+typ = parse_type()
+name = parse_identifier()
+expect_symbol('=')
+expr = parse_expr()
+expect_symbol(';')
+return Assign(typ=typ, name=name, expr=expr)
+```
+
+However, there has an annoying case: **expression parsing**. How this became the big problem for newbies? If we follow **LL** strict conversion from syntax as below:
+
+```bnf
+expr ::=
+  expr "*" expr
+  | expr "+" expr
+  | // ignore others
+```
+
+the conversion is:
+
+```py
+def parse_expr():
+    left_expr = parse_expr()
+    op = expect_oneof('*', '+')
+    right_expr = parse_expr()
+    return BinaryExpression(left_expr, op, right_expr)
+```
+
+This is **left recursive**, your parser would keep calling `parse_expr` and never end(or stack overflow, depend on which language you're using).
+
+Clever as you, might thought out how to fix this quickly:
+
+```bnf
+expr ::=
+  integer "*" expr
+  | integer "+" expr
+  | integer
+```
+
+here is conversion:
+
+```py
+def parse_expr():
+    left_expr = parse_integer()
+    try:
+        op = expect_oneof('*', '+')
+        try:
+            right_expr = parse_expr()
+            return BinaryExpression(left_expr, op, right_expr)
+        except:
+            # keep throw up the parse error
+            raise
+    except:
+        # to simplify example, assuming `expect_oneof` is under the control and won't throw unexpected exception
+        # no right hand side expression
+        return left_expr
+```
+
+It would work, until you have to handle **operator precedence**. For example, `*` would usually be applied before `+`. As clever as you, get the solution quickly again:
+
+```bnf
+expr ::=
+  term "*" expr
+  | term
+term ::=
+  integer "+" expr
+  | integer
+```
+
+However, the implementation work became quick heavy now.
+
+To solve all problem in once, yeah, we need a better way to handle this.
+
+TODO: Pratt Parsing
+
 ## Combinator
