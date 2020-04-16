@@ -1,4 +1,4 @@
-# Make your own programming language(or why we better don't do that)
+# Write you a programming language
 
 An overview
 
