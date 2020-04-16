@@ -1,9 +1,9 @@
 # Write you a programming language
 
-An overview
-
-## parser
-## semantic checker
-## code generator
-## optimizer
-## runtime
+```sh
+pip3 install mkdocs
+# develop
+mkdocs serve
+# build
+mkdocs build
+```
