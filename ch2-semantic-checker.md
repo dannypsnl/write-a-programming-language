@@ -52,7 +52,7 @@ We can simpling assuming there has no syntax error since parser should handle th
        #f)]))
 ```
 
-As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need unification: a function takes type, type, environment and returns a type. Obviously, we have to know type of sub-term, get type from a term called inference.
+As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need inference: a function get type from a term. Then check inferred result and expected type are the same thing.
 
 TODO: inference
 
