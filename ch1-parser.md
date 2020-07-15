@@ -424,3 +424,97 @@ parse_expression_1(lhs, min_precedence)
 ```
 
 ## Combinator
+
+Finally, my favourite technology is combinator, here is the reason:
+
+```racket
+#lang racket
+
+(require data/monad data/applicative) ;;; raco pkg install functional-lib
+(require megaparsack megaparsack/text) ;;; raco pkg install megaparsack
+
+(define lexeme/p
+  ;;; lexeme would take at least one space or do nothing
+  (do (or/p (many+/p space/p) void/p)
+    (pure (λ () 'lexeme))))
+(define (keyword/p keyword)
+  (do (string/p keyword)
+    (lexeme/p)
+    (pure keyword)))
+(define identifier/p
+  (do [id <- (many+/p letter/p)]
+    (lexeme/p)
+    (pure (list->string id))))
+(define (type/p ctx)
+  (do [check-struct <- (or/p (keyword/p "struct") void/p)]
+    [typ <- identifier/p]
+    (pure ((λ ()
+             (context/lookup-type-id ctx typ (eqv? check-struct "struct")))))))
+
+(define (struct-field/p ctx)
+  (do [field <- (list/p (type/p ctx) identifier/p)]
+    (char/p #\;)
+    (lexeme/p)
+    (pure field)))
+(define (struct-def/p ctx)
+  (do (keyword/p "struct")
+    [name <- identifier/p]
+    (char/p #\{)
+    (lexeme/p)
+    [fields <- (many/p (struct-field/p ctx))]
+    (lexeme/p)
+    (char/p #\})
+    (pure ((λ ()
+             (context/new-type ctx name (CStruct name fields))
+             (CStructDef name fields))))))
+```
+
+This just show how to parse a C structure definition using Racket combinator lib: `megaparsack`. Basically just as BNF definition, but with action easier and still using original language is the point.
+
+Quickly the problem would be how to make operator precedence parsing, because combinator doesn't good at loop directly, however, combinator good at recursive:
+
+```racket
+#lang racket
+
+(require data/monad data/applicative)
+(require megaparsack megaparsack/text)
+
+(define lexeme/p
+  ;;; lexeme would take at least one space or do nothing
+  (do (or/p (many+/p space/p) void/p)
+    (pure (λ () 'lexeme))))
+
+(define (op/p op-list)
+  (or/p (one-of/p op-list)
+        void/p))
+(define factor/p
+  (do [expr <- integer/p]
+    (lexeme/p)
+    (pure expr)))
+(define (binary/p high-level/p op-list)
+  (do [e <- high-level/p]
+    ; `es` parse operator then high-level unit, for example, `* 1`.
+    ; therefore, this parser would stop when the operator is not expected(aka. operator is in op-list)
+    ; rely on this fact we can leave this loop
+    [es <- (many/p (do [op <- (op/p op-list)]
+                     (lexeme/p)
+                     [e <- high-level/p]
+                     (pure (list op e))))]
+    (pure (foldl
+           (λ (op+rhs lhs)
+             (match op+rhs
+               [(list op rhs)
+                (list op lhs rhs)]))
+           e es))))
+(define (table/p base/p list-of-op-list)
+  (if (empty? list-of-op-list)
+      base/p
+      (table/p (binary/p base/p (car list-of-op-list))
+               (cdr list-of-op-list))))
+(define expr/p
+  (table/p factor/p
+           '((#\* #\/)
+             (#\+ #\-))))
+```
+
+The code shows how to define table parser, and it even more simple to extend, all we need to do is just add new operator list into the table.
