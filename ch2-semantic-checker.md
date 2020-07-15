@@ -52,6 +52,8 @@ We can simpling assuming there has no syntax error since parser should handle th
        #f)]))
 ```
 
+Before keep going, you can solve these questions: What's `env` and create `lookup/type-by-name`, `lookup/type-of`, and `extend/env` to make `:` works.
+
 As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need inference: a function get type from a term. Then check inferred result and expected type are the same thing.
 
 TODO: inference
