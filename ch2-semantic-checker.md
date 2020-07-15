@@ -52,6 +52,10 @@ We can simpling assuming there has no syntax error since parser should handle th
        #f)]))
 ```
 
+As the last case shows, `check` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need unification: a function takes type, type, environment and returns a type. Obviously, we have to know type of sub-term, get type from a term called inference.
+
+TODO: inference
+
 ## Lambda Cube
 
 ### lambda calculus
