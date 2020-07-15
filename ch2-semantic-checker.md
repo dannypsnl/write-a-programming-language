@@ -18,33 +18,33 @@ Semantic checking can be a super complicate issue, but rather than push you into
 ;;; BTW, add #:transparent for all structs
 ```
 
-We can simpling assuming there has no syntax error since parser should handle this than use valid abstraction syntax tree. What we interest on is how to check an input tree is valid:
+We can simpling assuming there has no syntax error since parser should handle this than use valid abstraction syntax tree. What we interest on is how to check an input tree is valid(`x : t` is commonly stands for type of `x` is `t`):
 
 ```racket
 ; t: tree
 ; ty: Type
 ; env: environment map
 ; return bool, #t for valid, #f for invalid
-(define (check t ty env)
+(define (: t ty env)
   (cond
     [(Int? t) (eqv? ty (Integer))]
-    [(Var? t) (check (lookup/type-of env (Var-name t)) ty env)]
+    [(Var? t) (: (lookup/type-of env (Var-name t)) ty env)]
     [(Struct/value? t)
      (let ([typ (lookup/type-by-name env (Struct/value-struct-name t))])
        (andmap (lambda (field field-value)
                  ; each field value should be valid member of field type
-                 (check field-value (Field-typ field) env))
+                 (: field-value (Field-typ field) env))
                (Struct-field* typ)
                (Struct/value-term* t)))]
     [(Func? t)
      (let ([env (extend/env env (Var-name (Func-var t)) (Var-typ (Func-var t)))])
        (if (Arrow? ty)
          (and (eqv? (Var-typ (Func-var t)) (Arrow-param-typ ty))
-              (check (Func-term t) (Arrow-return-typ ty) env))
+              (: (Func-term t) (Arrow-return-typ ty) env))
          #f))]
     [(Func/call? t)
      (if (Func? (Func/call-term1 t))
-       (check (Func/call-term2 t) ; argument term should have function var required type
+       (: (Func/call-term2 t) ; argument term should have function var required type
               (Var-typ (Func-var (Func? (Func/call-term1 t))))
               env)
        ;;; although I should handle much more complicate example like (((lambda (x) (lambda (a) (+ a x))) 1) 2)
@@ -52,7 +52,7 @@ We can simpling assuming there has no syntax error since parser should handle th
        #f)]))
 ```
 
-As the last case shows, `check` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need unification: a function takes type, type, environment and returns a type. Obviously, we have to know type of sub-term, get type from a term called inference.
+As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need unification: a function takes type, type, environment and returns a type. Obviously, we have to know type of sub-term, get type from a term called inference.
 
 TODO: inference
 
