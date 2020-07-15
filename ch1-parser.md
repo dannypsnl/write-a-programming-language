@@ -148,6 +148,7 @@ Here, I show a naive Lexer written in Rust:
 
 ```rust
 // first need to define Location
+#[derive(Clone, Debug)]
 struct Location {
     file_name: String,
     // line, column is the pair of location, use start point of token
@@ -158,7 +159,26 @@ struct Location {
     end: u32,
 }
 
+impl Location {
+    pub fn new<T: ToString>(
+        file_name: T,
+        line: u32,
+        column: u32,
+        start: u32,
+        end: u32,
+    ) -> Location {
+        Location {
+            file_name: file_name.to_string(),
+            line,
+            column,
+            start,
+            end,
+        }
+    }
+}
+
 // then need some Token Type
+#[derive(Clone, Debug, PartialEq)]
 enum TkType {
     EOF,
     Identifier,
@@ -236,10 +256,7 @@ impl Lexer {
             "let" => self.new_token(TkType::KeywordLet, s),
             _ => self.new_token(token_type.clone(), s),
         };
-        match token_type {
-            TkType::Comment => {}
-            _ => self.tokens.push(tok),
-        }
+        self.tokens.push(tok);
         self.ignore();
     }
 }
