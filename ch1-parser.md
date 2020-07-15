@@ -144,7 +144,169 @@ else:
 
 Which was very low-level program, we have to handle each space and newline and remember when we don't need them. For many language we can extract out lexer/tokenizer to do these. The idea was we don't have to directly work with string, but with token, a token could contain `location`, `content`, `type` these information to help parser keep doing the parsing. A lexer can directly skip whitespace and newline, update location information and normalize the content of token(for example we can parse int or parse float before the token sent to parser).
 
-TODO: simple lexer implmentation, with location info
+Here, I show a naive Lexer written in Rust:
+
+```rust
+// first need to define Location
+struct Location {
+    file_name: String,
+    // line, column is the pair of location, use start point of token
+    line: u32,
+    column: u32,
+    // start, end is the start offset to end offset for a token, for example: `let` at 0 has start: 0 and end: 3
+    start: u32,
+    end: u32,
+}
+
+// then need some Token Type
+enum TkType {
+    EOF,
+    Identifier,
+    KeywordLet,
+    Integer,
+}
+
+// A Token has location, type and value
+struct Token(Location, TkType, String);
+
+// A lexer moving between states, by each state has a behavior produce new state, and at the end must reach EOF to complete tokenizing, ok, so we can have such definition:
+enum State {
+    Fn(fn(&mut Lexer) -> State),
+    EOF,
+}
+
+// Now define Lexer
+struct Lexer {
+    file_name: String,
+    code: Vec<char>,
+    tokens: Vec<Token>,
+    state_fn: State,
+    start: usize,
+    offset: usize,
+    // (line, pos) represent the position for user
+    pos: u32,
+    line: u32,
+}
+
+// several helpers
+impl Lexer {
+    fn new<T: Into<String>>(file_name: T, code: T) -> Lexer {
+        Lexer {
+            file_name: file_name.into(),
+            code: code.into().chars().collect(),
+            tokens: vec![],
+            state_fn: State::Fn(whitespace),
+            start: 0,
+            offset: 0,
+            pos: 0,
+            line: 1, // line start from 1
+        }
+    }
+
+    fn ignore(&mut self) {
+        self.pos += (self.offset - self.start) as u32;
+        self.start = self.offset;
+    }
+    fn peek(&self) -> Option<char> {
+        match self.code.get(self.offset) {
+            Some(c) => Some(*c),
+            None => None,
+        }
+    }
+    fn next(&mut self) -> Option<char> {
+        self.offset += 1;
+        self.peek()
+    }
+    fn new_token(&mut self, token_type: TkType, value: String) -> Token {
+        Token(
+            Location::new(
+                self.file_name.clone(),
+                self.line,
+                self.pos,
+                self.start as u32,
+                self.offset as u32,
+            ),
+            token_type,
+            value,
+        )
+    }
+    fn emit(&mut self, token_type: TkType) {
+        let s: String = self.code[self.start..self.offset].into_iter().collect();
+        let tok = match s.as_str() {
+            "let" => self.new_token(TkType::KeywordLet, s),
+            _ => self.new_token(token_type.clone(), s),
+        };
+        match token_type {
+            TkType::Comment => {}
+            _ => self.tokens.push(tok),
+        }
+        self.ignore();
+    }
+}
+
+fn whitespace(lexer: &mut Lexer) -> State {
+    while let Some(c) = lexer.peek() {
+        if c == ' ' || c == '\r' || c == '\n' {
+            if c == '\n' {
+                lexer.next();
+                lexer.start = lexer.offset;
+                lexer.pos = 0;
+                lexer.line += 1;
+            } else {
+                lexer.next();
+            }
+        } else {
+            break;
+        }
+    }
+    lexer.ignore();
+
+    match lexer.peek() {
+        Some(_c @ '0'..='9') => State::Fn(number),
+        Some(c) => {
+            if in_identifier_set(c) {
+                State::Fn(ident)
+            } else {
+                unimplemented!("char: `{}`", c);
+            }
+        }
+        None => State::EOF,
+    }
+}
+
+fn in_identifier_set(c: char) -> bool {
+    c.is_alphanumeric() || c == '_'
+}
+fn ident(lexer: &mut Lexer) -> State {
+    while let Some(c) = lexer.next() {
+        if !in_identifier_set(c) {
+            break;
+        }
+    }
+    lexer.emit(TkType::Identifier);
+    State::Fn(whitespace)
+}
+fn number(lexer: &mut Lexer) -> State {
+    while let Some(c) = lexer.next() {
+        if !c.is_digit(10) {
+            break;
+        }
+    }
+    lexer.emit(TkType::Integer);
+    State::Fn(whitespace)
+}
+
+pub fn lex<T: Into<String>>(file_name: T, source: T) -> Vec<Token> {
+    let mut lexer = Lexer::new(file_name, source);
+    // tokenizing is just moving between state when possible
+    while let State::Fn(f) = lexer.state_fn {
+        lexer.state_fn = f(&mut lexer);
+    }
+    // emit final EOF to help Parser report EOF problem(optional, also can use no more token as EOF)
+    lexer.emit(TkType::EOF);
+    lexer.tokens
+}
+```
 
 ## Manual parser
 
