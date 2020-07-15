@@ -518,3 +518,7 @@ Quickly the problem would be how to make operator precedence parsing, because co
 ```
 
 The code shows how to define table parser, and it even more simple to extend, all we need to do is just add new operator list into the table.
+
+## Conclusion
+
+Now we already shows all technologies for parsing(at least, what I know), now you can make some simple language by your own, but let me warn you: make a language doesn't easy, make it be runnable is just the first step, you need to make editor plugin(and we can't naively rely on parser I tell you here, since they cannot partially handle syntax), powerful debugger, profiler, and many other things to help people work on this language productively. Ok, now keep moving to [semantic checking](ch2-semantic-checker.md)!
