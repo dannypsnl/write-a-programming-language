@@ -139,7 +139,7 @@ if identifier == "class":
     require('{')
     require('}')
 else:
-    // parse different rule
+    # parse different rule
 ```
 
 Which was very low-level program, we have to handle each space and newline and remember when we don't need them. For many language we can extract out lexer/tokenizer to do these. The idea was we don't have to directly work with string, but with token, a token could contain `location`, `content`, `type` these information to help parser keep doing the parsing. A lexer can directly skip whitespace and newline, update location information and normalize the content of token(for example we can parse int or parse float before the token sent to parser).
