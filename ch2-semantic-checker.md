@@ -56,7 +56,33 @@ Before keep going, you can solve these questions: What's `env` and create `looku
 
 As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need inference: a function get type from a term. Then check inferred result and expected type are the same thing.
 
-TODO: inference
+```racket
+(define (infer term env)
+  (cond
+    [(Int? t) (Integer)]
+    [(Var? t) (lookup/type-of env (Var-name t))]
+    [(Struct/value? t)
+     (let ([typ (lookup/type-by-name env (Struct/value-struct-name t))])
+       (andmap (lambda (field field-value)
+                 ; each field value should be valid member of field type
+                 (: field-value (Field-typ field) env))
+               (Struct-field* typ)
+               (Struct/value-term* t))
+       typ)]
+    [(Func? t)
+     ;;; introduce parameter into environment
+     (let ([env (extend/env env (Var-name (Func-var t)) (Var-typ (Func-var t)))])
+       (Arrow (Var-typ (Func-var t)) (infer (Func-term t) env)))]
+    [(Func/call? t)
+     (match (infer (Func/call-term1 t) env)
+       [(Arrow param-typ return-typ)
+        (if (eqv? (infer (Func/call-term2 t) env) param-typ)
+          return-typ
+          (error "type mismatch"))]
+       [_ (error "call on non-arrow type")])]))
+```
+
+Keep depends on `:` we create `infer` and work with sub-term with function(lambda)!
 
 ## Lambda Cube
 
