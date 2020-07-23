@@ -4,18 +4,17 @@ Semantic checking can be a super complicate issue, but rather than push you into
 
 ```racket
 ;;; Types
-(struct Integer ())
-(struct Arrow (param-typ return-typ))
+(struct Integer () #:transparent)
+(struct Arrow (param-typ return-typ) #:transparent)
 ; in Racket, * usually stands for many
-(struct Struct (name field*))
-(struct Field (typ name))
+(struct Struct (name field*) #:transparent)
+(struct Field (typ name) #:transparent)
 ;;; Terms
-(struct Struct/value (struct-name term*))
-(struct Int (value))
-(struct Var (typ name))
-(struct Func (var term))
-(struct Func/call (term1 term2))
-;;; BTW, add #:transparent for all structs
+(struct Struct/value (struct-name term*) #:transparent)
+(struct Int (value) #:transparent)
+(struct Var (typ name) #:transparent)
+(struct Func (var term) #:transparent)
+(struct Func/call (term1 term2) #:transparent)
 ```
 
 We can simpling assuming there has no syntax error since parser should handle this than use valid abstraction syntax tree. What we interest on is how to check an input tree is valid(`x : t` is commonly stands for type of `x` is `t`):
