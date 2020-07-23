@@ -83,6 +83,21 @@ As the last case shows, `:` is not good enough, the problem is we can have deepe
 
 Keep depends on `:` we create `infer` and work with sub-term with function(lambda)!
 
+Now we get a simple language have lambda/function, and some builtin types, however, sometimes we want higher type: a type depends on type, e.g. `(list int)`(or `list<int>`). To define such type constructor we need to leave type hole/parameters, we call such type constructor **polymorphism**. Let's refine our type's definitions for such concept:
+
+```racket
+(struct typ () #:transparent)
+(struct typ:freevar typ
+  (index opt-subst) #:transparent)
+(struct typ:constructor typ
+  (name typ-arg*) #:transparent)
+(struct typ:arrow typ
+  (param-typ return-typ) #:transparent)
+
+(define (typ:builtin name)
+  (typ:constructor name '()))
+```
+
 ## Lambda Cube
 
 ### lambda calculus
