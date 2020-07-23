@@ -98,20 +98,7 @@ Now we get a simple language have lambda/function, and some builtin types, howev
   (typ:constructor name '()))
 ```
 
-## Lambda Cube
-
-### lambda calculus
-
-### Simply typed lambda calculus
-
-### polymorphism
-
-#### unification
-
-#### let polymorphism
-
-### dependent type
-
-#### types depends on terms
-
-### calculus of construction
+TODO: polymorphism
+TODO: unification
+TODO: let polymorphism
+TODO: dependent type
