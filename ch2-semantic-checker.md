@@ -3,12 +3,6 @@
 Semantic checking can be a super complicate issue, but rather than push you into the crazy formal world, I would only show a simple overview about semantic checking. Semantic checking, would usually get confused with the concept about type checking, but not. Semantic checking includes type checking. For example, we can say expression `1/0` is invalid, whatever in runtime or compile time(CPU handles this usually by the way, also can see as a runtime checking). Semantic checking can do much more in runtime, but find out troubles in compile time as possible make a more robust system. A type, can be considered as properties of an object, with checking we can avoid unexpected input, e.g. `(lambda ([x : Integer]) x)` never takes `"Hello"` as the parameter, compiler can find out this. Now we get the first example of type check: same type checking. What's the same can be much more complicate than you might expect, but here I focus on the concept of same type instance. In the example, `Integer` is a **builtin** type, which means there can have non-builtin type, for example in **C** we can have `struct XXX` or `typedef`. With these, we can get start with our first language:
 
 ```racket
-;;; Types
-(struct Integer () #:transparent)
-(struct Arrow (param-typ return-typ) #:transparent)
-; in Racket, * usually stands for many
-(struct Struct (name field*) #:transparent)
-(struct Field (typ name) #:transparent)
 ;;; Terms
 (struct Struct/value (struct-name term*) #:transparent)
 (struct Int (value) #:transparent)
@@ -24,31 +18,37 @@ We can simpling assuming there has no syntax error since parser should handle th
 ; ty: Type
 ; env: environment map
 ; return bool, #t for valid, #f for invalid
-(define (: t ty env)
+(define (: t ty [env (make-immutable-hash '())])
   (cond
-    [(Int? t) (eqv? ty (Integer))]
-    [(Var? t) (: (lookup/type-of env (Var-name t)) ty env)]
+    [(Int? t) (eq? ty 'Integer)]
+    [(Var? t) (eq? (lookup/type-of env (Var-name t)) ty)]
     [(Struct/value? t)
-     (let ([typ (lookup/type-by-name env (Struct/value-struct-name t))])
-       (andmap (lambda (field field-value)
-                 ; each field value should be valid member of field type
-                 (: field-value (Field-typ field) env))
-               (Struct-field* typ)
-               (Struct/value-term* t)))]
+     (match ty
+       [`(struct ,name ,field-typ*)
+        (and (string=? name (Struct/value-struct-name t))
+             (andmap (λ (field-typ field-value)
+                       ; each field value should be valid member of field type
+                       (: field-value field-typ env))
+                     field-typ*
+                     (Struct/value-term* t)))]
+       [else #f])]
     [(Func? t)
-     (let ([env (extend/env env (Var-name (Func-var t)) (Var-typ (Func-var t)))])
-       (if (Arrow? ty)
-         (and (eqv? (Var-typ (Func-var t)) (Arrow-param-typ ty))
-              (: (Func-term t) (Arrow-return-typ ty) env))
-         #f))]
+     (let* ([v (Func-var t)]
+            [v-name (Var-name v)]
+            [v-typ (Var-typ v)])
+       (match ty
+         [`(-> ,param-typ ,return-typ)
+          (and (eqv? v-typ param-typ)
+               (: (Func-term t) return-typ (extend/env env v-name v-typ)))]
+         [else #f]))]
     [(Func/call? t)
      (if (Func? (Func/call-term1 t))
-       (: (Func/call-term2 t) ; argument term should have function var required type
-              (Var-typ (Func-var (Func? (Func/call-term1 t))))
-              env)
-       ;;; although I should handle much more complicate example like (((lambda (x) (lambda (a) (+ a x))) 1) 2)
-       ; but for simple, here just reject indirect function call
-       #f)]))
+         (: (Func/call-term2 t) ; argument term should have function var required type
+            (Var-typ (Func-var (Func? (Func/call-term1 t))))
+            env)
+         ;;; although I should handle much more complicate example like (((lambda (x) (lambda (a) (+ a x))) 1) 2)
+         ; but for simple, here just reject indirect function call
+         #f)]))
 ```
 
 Before keep going, you can solve these questions: What's `env` and create `lookup/type-by-name`, `lookup/type-of`, and `extend/env` to make `:` works.
