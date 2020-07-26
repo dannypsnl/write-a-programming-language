@@ -16,7 +16,7 @@
 ; ty: Type
 ; env: environment map
 ; return bool, #t for valid, #f for invalid
-(define (: t ty [env (make-immutable-hash '())])
+(define (: t ty [env (make-immutable-hash)])
   (cond
     [(Int? t) (eq? ty 'Integer)]
     [(Var? t) (eq? (lookup/type-of env (Var-name t)) ty)]
@@ -50,3 +50,27 @@
 
 (: (Int 1) 'Integer)
 (: (Func (Var 'Integer 'x) (Var 'Integer 'x)) '(-> Integer Integer))
+
+(define (infer t [env (make-immutable-hash)])
+  (cond
+    [(Int? t) 'Integer]
+    [(Var? t) (lookup/type-of env (Var-name t))]
+    [(Struct/value? t)
+     `(struct
+        ,(Struct/value-struct-name t)
+        ,(map (λ (field)
+                (infer field env))
+              (Struct/value-term* t)))]
+    [(Func? t)
+     ;;; introduce parameter into environment
+     (let ([env (extend/env env (Var-name (Func-var t)) (Var-typ (Func-var t)))])
+       `(-> ,(Var-typ (Func-var t)) ,(infer (Func-term t) env)))]
+    [(Func/call? t)
+     (match (infer (Func/call-term1 t) env)
+       [`(-> ,param-typ ,return-typ)
+        (if (eqv? (infer (Func/call-term2 t) env) param-typ)
+            return-typ
+            (error "type mismatch"))]
+       [_ (error "call on non-arrow type")])]))
+
+(infer (Func (Var 'Integer 'x) (Var 'Integer 'x)))
