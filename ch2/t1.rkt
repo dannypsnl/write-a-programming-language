@@ -40,13 +40,12 @@
                (: (Func-term t) return-typ (extend/env env v-name v-typ)))]
          [else #f]))]
     [(Func/call? t)
-     (if (Func? (Func/call-term1 t))
-         (: (Func/call-term2 t) ; argument term should have function var required type
-            (Var-typ (Func-var (Func? (Func/call-term1 t))))
-            env)
-         ;;; although I should handle much more complicate example like (((lambda (x) (lambda (a) (+ a x))) 1) 2)
-         ; but for simple, here just reject indirect function call
-         #f)]))
+     (let ([t1 (Func/call-term1 t)]
+           [t2 (Func/call-term2 t)])
+       (match (infer t1 env)
+         [`(-> ,param-typ ,return-typ)
+          (: t2 param-typ env)]
+         [else #f]))]))
 
 (: (Int 1) 'Integer)
 (: (Func (Var 'Integer 'x) (Var 'Integer 'x)) '(-> Integer Integer))
