@@ -41,7 +41,7 @@ In fact, compiler can not do the decision for you, whatever which behavior it pi
 Sometimes we are really want to print out the function value. So we introduce parenthesis in case:
 
 ```
-print("hello, ", user_input)
+print("hello, ", user_input())
 # or
 print "hello, " (user_input)
 ```
