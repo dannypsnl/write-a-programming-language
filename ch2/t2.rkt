@@ -8,28 +8,19 @@
 
 (define (occurs v t)
   (match* (v t)
-    [(v `(-> (,t1* ...) ,t2))
-     (or (ormap (λ (t1) (occurs v t1)) t1*)
-         (occurs v t2))]
-    ((v `(_ ,type-param*))
-     (ormap (λ (t) (occurs v t))
-            type-param*))
+    [(v `(,t* ...))
+     (ormap (λ (t) (occurs v t)) t*)]
     ((v t) (equal? v t))))
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(`(-> (,p1* ...) ,r1) `(-> (,p2* ...) ,r2))
-     (for-each (λ (p1 p2) (unify p1 p2))
-               p1* p2*)
-     (unify r1 r2)]
     [(_ t2) #:when (parameter? t2)
             (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
                 (t2 t1)
                 (error (format "~a occurs in ~a" (t2) t1)))]
     [(t1 _) #:when (parameter? t1)
             (unify t2 t1)]
-    [(`(,a ,a*) `(,b ,b*))
-     #:when (eqv? a b)
+    [(`(,a* ...) `(,b* ...))
      (for-each unify a* b*)]
     [(_ _)
      (unless (eqv? t1 t2)
@@ -47,41 +38,40 @@
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
                              (extend/env e x (recur-infer t e)))
-                           env
-                           x* xt*)])
+                           env x* xt*)])
        (recur-infer t let-env))]
-    [`(app ,f ,arg* ...)
-     (let ([ft (recur-infer f env)]
-           [argt* (map (λ (arg) (recur-infer arg env)) arg*)]
-           [free (make-parameter (gensym))])
-       (unify ft `(-> ,argt* ,free))
+    [`(quote ,p*)
+     `(list ,(if (empty? p*)
+                 (make-parameter (gensym))
+                 (let ([et (recur-infer (car p*) env)])
+                   (for-each (λ (et*) (unify et* et))
+                             (map (λ (x) (recur-infer x env)) (cdr p*)))
+                   et)))]
+    [`(,f ,arg* ...)
+     (let ([free (make-parameter (gensym))])
+       (unify (recur-infer f env)
+              `(-> ,(map (λ (arg) (recur-infer arg env)) arg*) ,free))
        free)]
-    [`,x
-     (cond
-       [(string? x) 'string]
-       [(number? x) 'number]
-       [(symbol? x) (lookup/type-of env x)]
-       [(list? x)
-        `(list ,(if (empty? x)
-                    (make-parameter (gensym))
-                    (let ([et (recur-infer (car x) env)])
-                      (for-each (λ (et*) (unify et* et))
-                                (map (λ (x) (recur-infer x env)) (cdr x)))
-                      et)))])]))
+    [x (cond
+         [(string? x) 'string]
+         [(number? x) 'number]
+         [(char? x) 'char]
+         [(symbol? x) (lookup/type-of env x)]
+         [else (error (format "unknown form: ~a" x))])]))
 
 (define (elim-free ty)
   (match ty
-    [`(-> (,p* ...) ,r)
-     `(-> ,(map elim-free p*) ,(elim-free r))]
-    [`(,a ,ty-arg* ...)
-     (cons (elim-free a) (map elim-free ty-arg*))]
-    [ty #:when (parameter? ty)
-        (elim-free (ty))]
-    [ty ty]))
+    [`(,ty* ...)
+     (map elim-free ty*)]
+    [ty (if (parameter? ty)
+            (elim-free (ty))
+            ty)]))
 
 (define (infer tm) (elim-free (recur-infer tm)))
 
-(infer '(1 2))
+(infer '#\c)
+(infer ''(1 2))
 (infer '(λ (x y) x))
 (infer '(let ([x 1]) x))
-(infer '(let ([y (λ (x y) x)]) (app y 1 2)))
+(infer '(let ([y (λ (x y) x)]) (y 1 2)))
+(infer '(let ([x '("a" "b" "c")]) x))
