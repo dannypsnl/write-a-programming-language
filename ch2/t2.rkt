@@ -9,7 +9,7 @@
 (define (occurs v t)
   (match* (v t)
     [(v `(free ,_))
-     (eqv? v t)]
+     (equal? v t)]
     [(v `(-> (,t1* ...) ,t2))
      (or (ormap (λ (t1) (occurs v t1)) t1*)
          (occurs v t2))]
@@ -22,15 +22,12 @@
   (match* (t1 t2)
     [(`(-> (,p1* ...) ,r1) `(-> (,p2* ...) ,r2))
      (for-each (λ (p1 p2) (unify p1 p2 subst))
-               p1*
-               p2*)
+               p1* p2*)
      (unify r1 r2 subst)]
     [(_ `(free ,_))
-     (let ([v t1]
-           [t t2])
-       (if (or (eqv? v t) (not (occurs v t)))
-           (hash-set! subst t v)
-           (void)))]
+     (if (or (eqv? t1 t2) (not (occurs t2 t1)))
+       (hash-set! subst t2 t1)
+       (error (format "~a occurs in ~a" t2 t1)))]
     [(`(free ,_) _) (unify t2 t1 subst)]
     [(`(,a ,a*) `(,b ,b*))
      #:when (eqv? a b)
