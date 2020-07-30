@@ -8,27 +8,26 @@
 
 (define (occurs v t)
   (match* (v t)
-    [(v `(free ,_))
-     (equal? v t)]
     [(v `(-> (,t1* ...) ,t2))
      (or (ormap (λ (t1) (occurs v t1)) t1*)
          (occurs v t2))]
     ((v `(_ ,type-param*))
      (ormap (λ (t) (occurs v t))
             type-param*))
-    ((_ _) false)))
+    ((v t) (equal? v t))))
 
-(define (unify t1 t2 subst)
+(define (unify t1 t2)
   (match* (t1 t2)
     [(`(-> (,p1* ...) ,r1) `(-> (,p2* ...) ,r2))
-     (for-each (λ (p1 p2) (unify p1 p2 subst))
+     (for-each (λ (p1 p2) (unify p1 p2))
                p1* p2*)
-     (unify r1 r2 subst)]
-    [(_ `(free ,_))
-     (if (or (eqv? t1 t2) (not (occurs t2 t1)))
-       (hash-set! subst t2 t1)
-       (error (format "~a occurs in ~a" t2 t1)))]
-    [(`(free ,_) _) (unify t2 t1 subst)]
+     (unify r1 r2)]
+    [(_ t2) #:when (parameter? t2)
+            (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
+                (t2 t1)
+                (error (format "~a occurs in ~a" (t2) t1)))]
+    [(t1 _) #:when (parameter? t1)
+            (unify t2 t1)]
     [(`(,a ,a*) `(,b ,b*))
      #:when (eqv? a b)
      (for-each unify a* b*)]
@@ -37,28 +36,25 @@
        (error (format "cannot unify type ~a and ~a" t1 t2)))]))
 
 ;;; infer should take a term and produce a type
-(define (recur-infer subst tm [env (make-immutable-hash)])
+(define (recur-infer tm [env (make-immutable-hash)])
   (match tm
     [`(λ (,x* ...) ,t)
      (let ([λ-env (foldl (λ (x e)
-                           (extend/env e x `(free ,(gensym))))
-                         env
-                         x*)])
+                           (extend/env e x (make-parameter (gensym))))
+                         env x*)])
        `(-> ,(map (λ (x) (lookup/type-of λ-env x)) x*)
-            ,(recur-infer subst t λ-env)))]
+            ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
-                             (extend/env e x (recur-infer subst t e)))
+                             (extend/env e x (recur-infer t e)))
                            env
                            x* xt*)])
-       (recur-infer subst t let-env))]
+       (recur-infer t let-env))]
     [`(app ,f ,arg* ...)
-     (let ([ft (recur-infer subst f env)]
-           [argt* (map (λ (arg) (recur-infer subst arg env)) arg*)]
-           [free `(free ,(gensym))])
-       (unify ft
-              `(-> ,argt* ,free)
-              subst)
+     (let ([ft (recur-infer f env)]
+           [argt* (map (λ (arg) (recur-infer arg env)) arg*)]
+           [free (make-parameter (gensym))])
+       (unify ft `(-> ,argt* ,free))
        free)]
     [`,x
      (cond
@@ -67,28 +63,23 @@
        [(symbol? x) (lookup/type-of env x)]
        [(list? x)
         `(list ,(if (empty? x)
-                    `(free ,(gensym))
-                    (let ([et (recur-infer subst (car x) env)])
-                      (for-each (λ (et*)
-                                  (unify et* et subst))
-                                (map (λ (x) (recur-infer subst x env)) (cdr x)))
+                    (make-parameter (gensym))
+                    (let ([et (recur-infer (car x) env)])
+                      (for-each (λ (et*) (unify et* et))
+                                (map (λ (x) (recur-infer x env)) (cdr x)))
                       et)))])]))
 
-(define (elim-free ty subst)
+(define (elim-free ty)
   (match ty
-    [`(-> ,p* ... ,r)
-     `(-> ,(map (λ (p) (elim-free p subst)) p*) ,(elim-free r subst))]
-    [`(free ,x)
-     (elim-free (hash-ref subst ty (λ () x))
-                subst)]
+    [`(-> (,p* ...) ,r)
+     `(-> ,(map elim-free p*) ,(elim-free r))]
     [`(,a ,ty-arg* ...)
-     `(,(elim-free a subst)
-       ,(map (λ (ty-arg) (elim-free ty-arg subst)) ty-arg*))]
-    [`,x x]))
+     (cons (elim-free a) (map elim-free ty-arg*))]
+    [ty #:when (parameter? ty)
+        (elim-free (ty))]
+    [ty ty]))
 
-(define (infer tm [subst (make-hash)])
-  (let ([ty (recur-infer subst tm)])
-    (elim-free ty subst)))
+(define (infer tm) (elim-free (recur-infer tm)))
 
 (infer '(1 2))
 (infer '(λ (x y) x))
