@@ -70,7 +70,10 @@
 
 (infer '#\c)
 (infer ''(1 2))
-(infer '(λ (x y) x))
+;;; id
+(infer '(λ (x) x))
 (infer '(let ([x 1]) x))
 (infer '(let ([y (λ (x y) x)]) (y 1 2)))
-(infer '(let ([x '("a" "b" "c")]) x))
+(infer '((λ () (let ([x '("a" "b" "c")]) x))))
+;;; const
+(infer '(λ (x) (let ([foo (λ (y) x)]) foo)))
