@@ -26,7 +26,6 @@
      (unless (eqv? t1 t2)
        (error (format "cannot unify type ~a and ~a" t1 t2)))]))
 
-;;; infer should take a term and produce a type
 (define (recur-infer tm [env (make-immutable-hash)])
   (match tm
     [`(λ (,x* ...) ,t)
