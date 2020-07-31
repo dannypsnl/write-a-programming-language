@@ -7,10 +7,10 @@
   (hash-set env v t))
 
 (define (occurs v t)
-  (match* (v t)
-    [(v `(,t* ...))
+  (match t
+    [`(,t* ...)
      (ormap (λ (t) (occurs v t)) t*)]
-    ((v t) (equal? v t))))
+    (t (equal? v t))))
 
 (define (unify t1 t2)
   (match* (t1 t2)
@@ -36,6 +36,8 @@
             ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
+                             ; use GEN for each binding
+                             ; INST for each variable occurs
                              (extend/env e x (recur-infer t e)))
                            env x* xt*)])
        (recur-infer t let-env))]
