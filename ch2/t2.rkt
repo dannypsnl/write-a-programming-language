@@ -68,12 +68,12 @@
 
 (define (infer tm) (elim-free (recur-infer tm)))
 
-(infer '#\c)
-(infer ''(1 2))
-;;; id
-(infer '(λ (x) x))
-(infer '(let ([x 1]) x))
-(infer '(let ([y (λ (x y) x)]) (y 1 2)))
-(infer '((λ () (let ([x '("a" "b" "c")]) x))))
-;;; const
-(infer '(λ (x) (let ([foo (λ (y) x)]) foo)))
+(module+ test
+  (require rackunit)
+
+  (check-equal? 'char (infer '#\c))
+  (check-equal? '(list number) (infer ''(1 2)))
+  ;;; id
+  (check-equal? 'number (infer '(let ([id (λ (x) x)]) (id 1))))
+  (check-equal? 'number (infer '(let ([y (λ (x y) x)]) (y 1 2))))
+  (check-equal? '(list string) (infer '((λ () (let ([x '("a" "b" "c")]) x))))))
