@@ -73,9 +73,14 @@
 (module+ test
   (require rackunit)
 
-  (check-equal? 'char (infer '#\c))
-  (check-equal? '(list number) (infer ''(1 2)))
+  (check-equal? (infer '#\c)
+                'char)
+  (check-equal? (infer ''(1 2))
+                '(list number))
   ;;; id
-  (check-equal? 'number (infer '(let ([id (λ (x) x)]) (id 1))))
-  (check-equal? 'number (infer '(let ([y (λ (x y) x)]) (y 1 2))))
-  (check-equal? '(list string) (infer '((λ () (let ([x '("a" "b" "c")]) x))))))
+  (check-equal? (infer '(let ([id (λ (x) x)]) (id 1)))
+                'number)
+  (check-equal? (infer '(let ([y (λ (x y) x)]) (y 1 2)))
+                'number)
+  (check-equal? (infer '((λ () (let ([x '("a" "b" "c")]) x))))
+                '(list string)))
