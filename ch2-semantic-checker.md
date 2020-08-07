@@ -163,7 +163,17 @@ Now we get a simple language have lambda/function, and some builtin types, howev
 (define (infer tm) (elim-free (recur-infer tm)))
 ```
 
-TODO: polymorphism
-TODO: unification
-TODO: let polymorphism
-TODO: dependent type
+TODO: explain HM
+
+Dependent type is the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions:
+
+```rkt
+(ind Nat
+  (z Nat)
+  (s (-> Nat Nat)))
+(ind (Vec [a Type] [n Nat])
+  (vecnil (Vec a z))
+  (vec:: (-> a (Vec a n) (Vec a (s n)))))
+```
+
+Where `(vec:: z vecnil)` is a evidence of type `(Vec Nat (s z))`.
