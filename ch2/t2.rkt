@@ -14,7 +14,8 @@
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(_ t2) #:when (parameter? t2)
+    [(_ t2) #:when (and (parameter? t2)
+                        (not (symbol? (t2))))
             (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
                 (t2 t1)
                 (error (format "~a occurs in ~a" (t2) t1)))]
@@ -24,7 +25,7 @@
      (for-each unify a* b*)]
     [(_ _)
      (unless (eqv? t1 t2)
-       (error (format "cannot unify type ~a and ~a" t1 t2)))]))
+       (error (format "cannot unify type ~a and ~a" (elim-free t1) (elim-free t2))))]))
 
 (define (recur-infer tm [env (make-immutable-hash)])
   (match tm
@@ -41,6 +42,8 @@
                              (extend/env e x (recur-infer t e)))
                            env x* xt*)])
        (recur-infer t let-env))]
+    [`(pair ,a ,b)
+     `(pair ,(recur-infer a env) ,(recur-infer b env))]
     [`(quote ,p*)
      `(list ,(if (empty? p*)
                  (make-parameter (gensym))
@@ -69,6 +72,8 @@
             ty)]))
 
 (define (infer tm) (elim-free (recur-infer tm)))
+
+(infer '(λ (id) (pair (id "") (id '(1 2 3)))))
 
 (module+ test
   (require rackunit)
