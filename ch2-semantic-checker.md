@@ -101,14 +101,15 @@ Now we get a simple language have lambda/function, and some builtin types, howev
 
 ```rkt
 (define (occurs v t)
-  (match* (v t)
-    [(v `(,t* ...))
+  (match t
+    [`(,t* ...)
      (ormap (λ (t) (occurs v t)) t*)]
-    ((v t) (equal? v t))))
+    (t (equal? v t))))
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(_ t2) #:when (parameter? t2)
+    [(_ t2) #:when (and (parameter? t2)
+                        (not (symbol? (t2))))
             (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
                 (t2 t1)
                 (error (format "~a occurs in ~a" (t2) t1)))]
@@ -118,7 +119,7 @@ Now we get a simple language have lambda/function, and some builtin types, howev
      (for-each unify a* b*)]
     [(_ _)
      (unless (eqv? t1 t2)
-       (error (format "cannot unify type ~a and ~a" t1 t2)))]))
+       (error (format "cannot unify type ~a and ~a" (elim-free t1) (elim-free t2))))]))
 
 (define (recur-infer tm [env (make-immutable-hash)])
   (match tm
@@ -133,6 +134,8 @@ Now we get a simple language have lambda/function, and some builtin types, howev
                              (extend/env e x (recur-infer t e)))
                            env x* xt*)])
        (recur-infer t let-env))]
+    [`(pair ,a ,b)
+     `(pair ,(recur-infer a env) ,(recur-infer b env))]
     [`(quote ,p*)
      `(list ,(if (empty? p*)
                  (make-parameter (gensym))
@@ -173,7 +176,7 @@ In this implementation, I simply pattern matching on **s-exp** to make code more
 
 We only escape `symbol?`, this should lookup in the environment. Except these, are invalid form. Rest forms are `let`, `lambda(function)`, `list`, and `application(function call)`.
 
-`list` are something like `'(1 2 3)`, in the case, we return `(list ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
+`list` are something like `'(1 2 3)`, `pair` are `(pair 1 2)`. In these cases, we return `(<list or pair> ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
 
 Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't know the type of parameter, therefore, given `?0`, `?1`, `?2` and so on. Then use new envionment to infer its body.
 
