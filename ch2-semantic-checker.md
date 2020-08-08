@@ -163,7 +163,25 @@ Now we get a simple language have lambda/function, and some builtin types, howev
 (define (infer tm) (elim-free (recur-infer tm)))
 ```
 
-TODO: explain HM
+In this implementation, I simply pattern matching on **s-exp** to make code more compact, also use **s-exp** to represent type. The less pattern `x` takes all forms, then we use `cond` to handle different case:
+
+```rkt
+(infer "hello") ; string
+(infer #\v) ; char
+(infer 100) ; number
+```
+
+We only escape `symbol?`, this should lookup in the environment. Except these, are invalid form. Rest forms are `let`, `lambda(function)`, `list`, and `application(function call)`.
+
+`list` are something like `'(1 2 3)`, in the case, we return `(list ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
+
+Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't know the type of parameter, therefore, given `?0`, `?1`, `?2` and so on. Then use new envionment to infer its body.
+
+Application rule unify the `f` type with a new arrow(`->`) type which constructed by arguments' type, and a free type variable for return type. Then give final return type as its result.
+
+Finally, let rule, which seems like not need, is quite important. TODO: let rule
+
+### Dependent type
 
 Dependent type is the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions:
 
