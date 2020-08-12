@@ -36,11 +36,12 @@
      (let ([λ-env (foldl (λ (x e)
                            (extend/env e x (make-parameter (gensym '?))))
                          env x*)])
-       `(-> ,(map (λ (x) (lookup/type-of λ-env x)) x*)
+       `(-> ,(map (λ (x) (recur-infer x λ-env)) x*)
             ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
-                             (extend/env e x (recur-infer t e)))
+                             (extend/env e x
+                                         (λ () (recur-infer t e))))
                            env x* xt*)])
        (recur-infer t let-env))]
     [`(pair ,a ,b)
@@ -61,7 +62,11 @@
          [(string? x) 'string]
          [(number? x) 'number]
          [(char? x) 'char]
-         [(symbol? x) (lookup/type-of env x)]
+         [(symbol? x)
+          (let ([t (lookup/type-of env x)])
+            (if (and (procedure? t) (not (parameter? t)))
+                (t)
+                t))]
          [else (error (format "unknown form: ~a" x))])]))
 
 (define (elim-free ty)
@@ -87,4 +92,7 @@
   (check-equal? (infer '(let ([y (λ (x y) x)]) (y 1 2)))
                 'number)
   (check-equal? (infer '((λ () (let ([x '("a" "b" "c")]) x))))
-                '(list string)))
+                '(list string))
+  (check-equal? (infer '(let ([id (λ (x) x)])
+                          (pair (id 1) (id "hello"))))
+                '(pair number string)))

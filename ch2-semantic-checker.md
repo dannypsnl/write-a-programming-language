@@ -130,11 +130,12 @@ Now we get a simple language have lambda/function, and some builtin types, howev
      (let ([λ-env (foldl (λ (x e)
                            (extend/env e x (make-parameter (gensym '?))))
                          env x*)])
-       `(-> ,(map (λ (x) (lookup/type-of λ-env x)) x*)
+       `(-> ,(map (λ (x) (recur-infer x λ-env)) x*)
             ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
-                             (extend/env e x (recur-infer t e)))
+                             (extend/env e x
+                                         (λ () (recur-infer t e))))
                            env x* xt*)])
        (recur-infer t let-env))]
     [`(pair ,a ,b)
@@ -155,7 +156,11 @@ Now we get a simple language have lambda/function, and some builtin types, howev
          [(string? x) 'string]
          [(number? x) 'number]
          [(char? x) 'char]
-         [(symbol? x) (lookup/type-of env x)]
+         [(symbol? x)
+          (let ([t (lookup/type-of env x)])
+            (if (and (procedure? t) (not (parameter? t)))
+                (t)
+                t))]
          [else (error (format "unknown form: ~a" x))])]))
 
 (define (elim-free ty)
@@ -178,6 +183,15 @@ In this implementation, I simply pattern matching on **s-exp** to make code more
 ```
 
 We only escape `symbol?`, this should lookup in the environment. Except these, are invalid form. Rest forms are `let`, `lambda(function)`, `list`, and `application(function call)`.
+
+However, in symbol we not only lookup, that is because let rule would introduce `forall`(represent by `(λ () t)`), therefore, if we get a procedure is not a parameter, it needs to be instantiated. For example:
+
+```rkt
+(let ([id (λ (x) x)])
+  (pair (id 1) (id "")))
+```
+
+In this case, `id` type should be instantiated before usage, else result type would be we cannot unify `number` and `string` caused by rebinding the free type variable which belongs to the parameter of `id` from `number` to `string`. With an indirect type produce from procedure, `id` get new free type variable in the second application, then we can get `(pair number string)` as expected.
 
 `list` are something like `'(1 2 3)`, `pair` are `(pair 1 2)`. In these cases, we return `(<list or pair> ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
 
