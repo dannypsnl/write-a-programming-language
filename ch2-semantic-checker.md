@@ -108,17 +108,21 @@ Now we get a simple language have lambda/function, and some builtin types, howev
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(_ t2) #:when (parameter? t2)
-            (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
-                (t2 t1)
-                (error (format "~a occurs in ~a" (t2) t1)))]
+    [(_ t2) #:when (and (parameter? t2)
+                        ;;; ensure t2 is still free
+                        (string-prefix? (symbol->string (t2)) "?"))
+            (when (or (eqv? t1 (t2)) (occurs (t2) t1))
+              (error (format "~a occurs in ~a" (t2) t1)))
+            (t2 t1)]
     [(t1 _) #:when (parameter? t1)
             (unify t2 t1)]
     [(`(,a* ...) `(,b* ...))
      (for-each unify a* b*)]
     [(_ _)
-     (unless (eqv? t1 t2)
-       (error (format "cannot unify type ~a and ~a" (elim-free t1) (elim-free t2))))]))
+     (let ([a (elim-free t1)]
+           [b (elim-free t2)])
+       (unless (eqv? a b)
+         (error (format "cannot unify type ~a and ~a" a b))))]))
 
 (define (recur-infer tm [env (make-immutable-hash)])
   (match tm
@@ -130,8 +134,6 @@ Now we get a simple language have lambda/function, and some builtin types, howev
             ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
-                             ; use GEN for each binding
-                             ; INST for each variable occurs
                              (extend/env e x (recur-infer t e)))
                            env x* xt*)])
        (recur-infer t let-env))]
