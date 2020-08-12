@@ -14,8 +14,7 @@
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(_ t2) #:when (and (parameter? t2)
-                        (not (symbol? (t2))))
+    [(_ t2) #:when (parameter? t2)
             (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
                 (t2 t1)
                 (error (format "~a occurs in ~a" (t2) t1)))]
@@ -31,7 +30,7 @@
   (match tm
     [`(λ (,x* ...) ,t)
      (let ([λ-env (foldl (λ (x e)
-                           (extend/env e x (make-parameter (gensym))))
+                           (extend/env e x (make-parameter (gensym '?))))
                          env x*)])
        `(-> ,(map (λ (x) (lookup/type-of λ-env x)) x*)
             ,(recur-infer t λ-env)))]
@@ -46,13 +45,13 @@
      `(pair ,(recur-infer a env) ,(recur-infer b env))]
     [`(quote ,p*)
      `(list ,(if (empty? p*)
-                 (make-parameter (gensym))
+                 (make-parameter (gensym '?))
                  (let ([et (recur-infer (car p*) env)])
                    (for-each (λ (et*) (unify et* et))
                              (map (λ (x) (recur-infer x env)) (cdr p*)))
                    et)))]
     [`(,f ,arg* ...)
-     (let ([free (make-parameter (gensym))])
+     (let ([free (make-parameter (gensym '?))])
        (unify (recur-infer f env)
               `(-> ,(map (λ (arg) (recur-infer arg env)) arg*) ,free))
        free)]
@@ -73,7 +72,9 @@
 
 (define (infer tm) (elim-free (recur-infer tm)))
 
-(infer '(λ (id) (pair (id "") (id '(1 2 3)))))
+(infer '((λ (id) (id "")) (λ (x) x)))
+(infer '(let ([id (λ (x) x)])
+          (id "")))
 
 (module+ test
   (require rackunit)

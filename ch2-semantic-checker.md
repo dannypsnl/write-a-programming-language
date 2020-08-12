@@ -108,8 +108,7 @@ Now we get a simple language have lambda/function, and some builtin types, howev
 
 (define (unify t1 t2)
   (match* (t1 t2)
-    [(_ t2) #:when (and (parameter? t2)
-                        (not (symbol? (t2))))
+    [(_ t2) #:when (parameter? t2)
             (if (or (eqv? t1 (t2)) (not (occurs (t2) t1)))
                 (t2 t1)
                 (error (format "~a occurs in ~a" (t2) t1)))]
@@ -125,12 +124,14 @@ Now we get a simple language have lambda/function, and some builtin types, howev
   (match tm
     [`(λ (,x* ...) ,t)
      (let ([λ-env (foldl (λ (x e)
-                           (extend/env e x (make-parameter (gensym))))
+                           (extend/env e x (make-parameter (gensym '?))))
                          env x*)])
        `(-> ,(map (λ (x) (lookup/type-of λ-env x)) x*)
             ,(recur-infer t λ-env)))]
     [`(let ([,x* ,xt*] ...) ,t)
      (let ([let-env (foldl (λ (x t e)
+                             ; use GEN for each binding
+                             ; INST for each variable occurs
                              (extend/env e x (recur-infer t e)))
                            env x* xt*)])
        (recur-infer t let-env))]
@@ -138,13 +139,13 @@ Now we get a simple language have lambda/function, and some builtin types, howev
      `(pair ,(recur-infer a env) ,(recur-infer b env))]
     [`(quote ,p*)
      `(list ,(if (empty? p*)
-                 (make-parameter (gensym))
+                 (make-parameter (gensym '?))
                  (let ([et (recur-infer (car p*) env)])
                    (for-each (λ (et*) (unify et* et))
                              (map (λ (x) (recur-infer x env)) (cdr p*)))
                    et)))]
     [`(,f ,arg* ...)
-     (let ([free (make-parameter (gensym))])
+     (let ([free (make-parameter (gensym '?))])
        (unify (recur-infer f env)
               `(-> ,(map (λ (arg) (recur-infer arg env)) arg*) ,free))
        free)]
@@ -182,7 +183,7 @@ Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't
 
 Application rule unify the `f` type with a new arrow(`->`) type which constructed by arguments' type, and a free type variable for return type. Then give final return type as its result.
 
-Finally, let rule, which seems like not need, is quite important. TODO: let rule
+Finally, let rule, which seems like not need, is quite important. In Racket, a possible transformation is `let` to `lambda`, however, in HM system they are different, an example: `((λ (id) (id "")) (λ (x) x))`, we all know the answer is `string`, but it cannot produce this caused by `id` has a free type. With `let` rule, we can have: `(let ([id (λ (x) x)]) (id ""))` and get `string` as expected, but notice that, we can make a trick: bind the inferred type to abstraction's parameter if it's an immediate application. Another way is introducing make polymorphism type can in the definition of parameter.
 
 ### Dependent type
 
