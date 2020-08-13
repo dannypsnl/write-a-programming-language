@@ -184,7 +184,7 @@ In this implementation, I simply pattern matching on **s-exp** to make code more
 
 We only escape `symbol?`, this should lookup in the environment. Except these, are invalid form. Rest forms are `let`, `lambda(function)`, `list`, and `application(function call)`.
 
-However, in symbol we not only lookup, that is because let rule would introduce `forall`(represent by `(λ () t)`), therefore, if we get a procedure is not a parameter, it needs to be instantiated. For example:
+However, in symbol we not only lookup, that is because let rule would introduce **GEN**(represent by `(λ () t)`), therefore, if we get a procedure is not a parameter, it needs to be instantiated(rule **INST**). For example:
 
 ```rkt
 (let ([id (λ (x) x)])
