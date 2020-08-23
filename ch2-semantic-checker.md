@@ -203,7 +203,15 @@ Finally, let rule, which seems like not need, is quite important. In Racket, a p
 
 ### Dependent type
 
-Dependent type is the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions:
+Dependent type is the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions(**Agda**):
+
+```agda
+data Vec (A : Set a) : ℕ → Set a where
+  []  : Vec A zero
+  _∷_ : ∀ {n} (x : A) (xs : Vec A n) → Vec A (suc n)
+```
+
+We can try to represent these with **S expression**
 
 ```rkt
 (ind Nat
@@ -214,4 +222,43 @@ Dependent type is the final part of this chapter, which means type can depend on
   (vec:: (-> a (Vec a n) (Vec a (s n)))))
 ```
 
-Where `(vec:: z vecnil)` is a evidence of type `(Vec Nat (s z))`.
+Where `(vec:: z vecnil)` is a evidence of type `(Vec Nat (s z))`. A simple partial interpreter of this example can be created in a few step by removing some high-level abilities from language.
+
+1. Assuming all term has well-typed, this can be ensure by only using `(struct tt (tm ty) #:transparent)` to ensure.
+2. The type of type is `U`, the type of `U` is `U`. `U` stands for universe, but you can ignore it currently.
+3. Without syntax sugar.
+4. No optimizing.
+5. Remove some checking(which means language is not as safe as langauge like **Agda** or any other theorem proof assitant).
+
+Then we can start creating our first dependent type language under **Racket**. For every `inductive` data type, we use several `define` to define it.
+
+```rkt
+(define Bool (tt 'Bool U))
+(define (true) (tt 'true Bool))
+(define (false) (tt 'false Bool))
+
+(define Nat (tt 'Nat U))
+(define (z) (tt 'z Nat))
+(define (s n)
+  (: n Nat)
+  (tt `(s ,n) Nat))
+```
+
+`Bool` and `Nat` are quite easy to understand, helper functions we need at here were `tt`(defined) and `:`, follow typing rule, `a : A` means a judgement that `a` has type `A` and represent as `(: a A)` in our language. Implementation of `:` is take out type of term(we ensure every terms were well-typed under `tt`) and ensure it's same as expected one.
+
+```rkt
+(define (: term type)
+  (unless (ty= (tt-ty term) type)
+    (error (format "~a is a ~a, not a ~a"
+                   (pretty term)
+                   (pretty (tt-ty term))
+                   (pretty type)))))
+```
+
+Let's ignore `pretty` for now, and dig into another helper: `ty=`, `ty=` stands for type equality checking, and simply based on `equal?` test since we would only use **S expression** to represent type.
+
+```rkt
+(define (ty= t1 t2)
+  (unless (equal? (pretty t1) (pretty t2))
+    (error (format "~a != ~a" (pretty t1) (pretty t2)))))
+```
