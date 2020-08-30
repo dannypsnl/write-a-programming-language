@@ -224,7 +224,16 @@ We can try to represent these with **S expression**
 
 Where `(vec:: z vecnil)` is a evidence of type `(Vec Nat (s z))`. A simple partial interpreter of this example can be created in a few step by removing some high-level abilities from language.
 
-1. Assuming all term was well-typed, this can be ensured by only using `(struct tt (tm ty) #:transparent)` to ensure.
+1. Assuming all term was well-typed, this can be ensured by only using `tt` to ensure.
+
+   ```rkt
+   (struct tt (tm ty)
+     #:methods gen:custom-write
+     [(define (write-proc tt port mode)
+        (fprintf port "~a" (pretty tt)))]
+     #:transparent)
+   ```
+
 2. The type of type is `U`, the type of `U` is `U`. `U` stands for the universe, but you can ignore it currently.
 3. Without syntax sugar.
 4. No optimizing.
@@ -363,7 +372,7 @@ We can even make some proof!
   (let ([r (refl)])
     (unify (≡ y x) (<- r))
     r))
-(pretty (sym))
+(sym)
 
 (define (Nat/+ m n)
   (: m Nat)
@@ -376,7 +385,7 @@ We can even make some proof!
   (let ([r (refl)])
     (unify (≡ (Nat/+ (z) x) x) (<- r))
     r))
-(pretty (+0/Nat))
+(+0/Nat)
 ```
 
 Notice the definition of `match` can only work for such simple case, it won't work with `? : Nat`, also lacking termination check which cannot be a safe definition.
