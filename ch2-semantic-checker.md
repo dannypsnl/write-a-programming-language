@@ -224,11 +224,11 @@ We can try to represent these with **S expression**
 
 Where `(vec:: z vecnil)` is a evidence of type `(Vec Nat (s z))`. A simple partial interpreter of this example can be created in a few step by removing some high-level abilities from language.
 
-1. Assuming all term has well-typed, this can be ensure by only using `(struct tt (tm ty) #:transparent)` to ensure.
-2. The type of type is `U`, the type of `U` is `U`. `U` stands for universe, but you can ignore it currently.
+1. Assuming all term was well-typed, this can be ensured by only using `(struct tt (tm ty) #:transparent)` to ensure.
+2. The type of type is `U`, the type of `U` is `U`. `U` stands for the universe, but you can ignore it currently.
 3. Without syntax sugar.
 4. No optimizing.
-5. Remove some checking(which means language is not as safe as langauge like **Agda** or any other theorem proof assitant).
+5. Remove some checking(which means language is not as safe as language like **Agda** or any other theorem proof assitant).
 
 Then we can start creating our first dependent type language under **Racket**. For every `inductive` data type, we use several `define` to define it.
 
@@ -262,3 +262,121 @@ Let's ignore `pretty` for now, and dig into another helper: `ty=`, `ty=` stands 
   (unless (equal? (pretty t1) (pretty t2))
     (error (format "~a != ~a" (pretty t1) (pretty t2)))))
 ```
+
+Since all term was well-typed, inference can be simple.
+
+```rkt
+(define (<- t)
+  (match t
+    ['U U]
+    [t (tt-ty (?/get t))]))
+```
+
+`?/get` is a helper, in this language, sometime we have free variables. For example: `(nil)` is a `(List ?)`, we have no idea what was `?` yet. To represent such a concept, we prepared `?` and `?/get`.
+
+```rkt
+(define (? ty) (make-parameter (tt (gensym '?) ty)))
+(define (?/get p?) (if (parameter? p?) (p?) p?))
+```
+
+But these were helper, the core concept was `unify`, `unify` works for code like: `(:: (z) (nil))`. Its type should be `(List Nat)`, the way was `unify (List ?nil) (List Nat)`.
+
+```rkt
+(define (occurs v t)
+  (match t
+    [`(,t* ...)
+     (ormap (λ (t) (occurs v t)) t*)]
+    [t (equal? v t)]))
+(define (unify t1 t2)
+  (match* (t1 t2)
+    [(_ (? parameter?))
+     (unless (or (eqv? t1 (?/get t2)) (not (occurs (?/get t2) t1)))
+       (error (format "~a occurs in ~a" (?/get t2) (?/get t1))))
+     (t2 (?/get t1))]
+    ; swap
+    [((? parameter?) _) (unify t2 t1)]
+    [(`(,a* ...) `(,b* ...))
+     (map unify a* b*)]
+    [((tt tm1 ty1) (tt tm2 ty2))
+     (unify ty1 ty2)
+     (unify tm1 tm2)]
+    ; not free variable, then we expect they are the same
+    [(_ _) (ty= t1 t2)]))
+```
+
+All need to do was keep checking any cases, and instantiate all free variable, final judge they are same. Occurs check prevents cycle reference in type/term. The final function was `pretty`, which prints term better.
+
+```rkt
+(define (pretty t)
+  (match (?/get t)
+    [`(,a* ...) (map pretty a*)]
+    [(tt tm ty) `(: ,(pretty tm) ,(pretty ty))]
+    [t t]))
+```
+
+Finally, let's view some examples can work with these fundamental:
+
+```rkt
+(define (List A)
+  (: A U)
+  (tt `(List ,A) U))
+(define (nil) (tt 'nil (List (? U))))
+(define (:: #:A [A (? U)] a lst)
+  (unify A (<- a))
+  (: A U)
+  (unify (List A) (<- lst))
+  (tt `(:: ,a ,lst) (List A)))
+
+(define (Vec LEN E)
+  (: LEN Nat)
+  (: E U)
+  (tt `(Vec ,LEN ,E) U))
+(define (vecnil) (tt 'vecnil (Vec (z) (? U))))
+(define (vec:: #:E [E (? U)] #:LEN [LEN (? Nat)] e v)
+  (unify E (<- e))
+  (: E U)
+  (unify (Vec LEN E) (<- v))
+  (tt `(vec:: ,e ,v) (Vec (s LEN) E)))
+
+(define (vec/length v)
+    (define LEN (? Nat))
+    (define E (? U))
+    (unify (Vec LEN E) (<- v))
+    LEN)
+```
+
+We can even make some proof!
+
+```rkt
+(define (≡ #:A [A (? U)] a b)
+  (: A U)
+  (unify (<- a) A)
+  (: b A)
+  (tt `(≡ ,A ,a ,b) U))
+(define (refl #:A [A (? U)] #:a [a (? A)])
+  (tt 'refl (≡ a a)))
+
+
+(define (sym #:A [A (? U)] #:x [x (? A)] #:y [y (? A)]
+             [P1 (? (≡ x y))])
+  (unify (refl) P1)
+  (let ([r (refl)])
+    (unify (≡ y x) (<- r))
+    r))
+(pretty (sym))
+
+(define (Nat/+ m n)
+  (: m Nat)
+  (: n Nat)
+  (match (tt-tm (?/get m))
+    ['z n]
+    [`(s ,m-)
+     (s (Nat/+ m- n))]))
+(define (+0/Nat #:x [x (? Nat)])
+  (let ([r (refl)])
+    (unify (≡ (Nat/+ (z) x) x) (<- r))
+    r))
+(pretty (+0/Nat))
+```
+
+Notice the definition of `match` can only work for such simple case, it won't work with `? : Nat`, also lacking termination check which cannot be a safe definition.
