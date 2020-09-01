@@ -35,7 +35,7 @@
         (map (λ (i)
                (match i
                  [`(tag ,name)
-                  (hash-ref jump-target* name)]
+                  (hash-ref jump-target* name #f)]
                  [else #f]))
              (cdr inst*))))
 
