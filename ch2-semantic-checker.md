@@ -1,6 +1,10 @@
 # Semantic Checker
 
-Semantic checking can be a super complicate issue, but rather than push you into the crazy formal world, I would only show a simple overview about semantic checking. Semantic checking, would usually get confused with the concept about type checking, but not. Semantic checking includes type checking. For example, we can say expression `1/0` is invalid, whatever in runtime or compile time(CPU handles this usually by the way, also can see as a runtime checking). Semantic checking can do much more in runtime, but find out troubles in compile time as possible make a more robust system. A type, can be considered as properties of an object, with checking we can avoid unexpected input, e.g. `(lambda ([x : Integer]) x)` never takes `"Hello"` as the parameter, compiler know `"Hello"` is not an `Integer`. This is the first example of type check: same type checking. What's the same can be much more complicate than you might expect, but here I focus on the concept of **same type instance**. In this example, `Integer` is a **builtin** type, its equal rule only allows exactly same type representation: `Integer`. With builtin, of course there have non-builtin types, for example in **C** we can use `struct XXX` or `typedef` to create new type. With these basic concepts, we can get start with our first language:
+Semantic checking can be a super complicate issue, but rather than push you into the crazy formal world, I would only show a simple overview about semantic checking. Semantic checking, would usually get confused with the concept about type checking, but not. Semantic checking includes type checking. For example, we can say expression `1/0` is invalid, whatever in runtime or compile time(CPU handles this usually by the way, also can see as a runtime checking). Semantic checking can do much more in runtime, but find out troubles in compile time as possible make a more robust system. A type, can be considered as properties of an object, with checking we can avoid unexpected input, e.g. `(lambda ([x : Integer]) x)` never takes `"Hello"` as the parameter, compiler know `"Hello"` is not an `Integer`. This is the first example of type check: same type checking. What's the same can be much more complicate than you might expect, but here I focus on the concept of **same type instance**. In this example, `Integer` is a **builtin** type, its equal rule only allows exactly same type representation: `Integer`. With builtin, of course there have non-builtin types, for example in **C** we can use `struct XXX` or `typedef` to create new type. With these basic concepts, we can get start with our first language.
+
+### Simple Type Checking
+
+The following structures define a set of valid term(component of language).
 
 ```rkt
 ;;; Terms
@@ -11,7 +15,7 @@ Semantic checking can be a super complicate issue, but rather than push you into
 (struct Func/call (term1 term2) #:transparent)
 ```
 
-We can simpling assuming there has no syntax error since parser should handle this than use valid abstraction syntax tree. What we interest on is how to check an input tree is valid(`x : t` is commonly stands for type of `x` is `t`):
+We can simpling assuming there has no syntax error since a good parser should handle that than use valid abstraction syntax tree. What we interest on is how to check an input tree is valid(`x : t` is commonly stands for type of `x` is `t`):
 
 ```rkt
 ; t: tree
@@ -53,7 +57,7 @@ We can simpling assuming there has no syntax error since parser should handle th
 
 Before keep going, you can solve these questions: What's `env` and create `lookup/type-by-name`, `lookup/type-of`, and `extend/env` to make `:` works.
 
-As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need inference: a function get type from a term. Then check inferred result and expected type are the same thing.
+As the last case shows, `:` is not good enough, the problem is we can have deeper function hiding in the tree. To find out them, we need to inference the type from a term first, then check inferred result and expected type are the same thing. Therefore, we would need a function: `infer`.
 
 ```rkt
 (define (infer t [env (make-immutable-hash)])
@@ -97,7 +101,11 @@ With `infer` we can improve `:` and make it work with sub-term with function(lam
 +         [else #f]))]))
 ```
 
-Now we get a simple language have lambda/function, and some builtin types, however, sometimes we want higher type: a type depends on type, e.g. `(list int)`(or `list<int>`). To define such type constructor we need to leave type hole/parameters, we call such type constructor **polymorphism**. The most famous system call Hindley-Milner system which has strong typing without any type annotation, although now we know such ability is not that important even harmful, we learn it for the concept of unification:
+### Polymorphism
+
+Now we get a simple language have lambda(a.k.a. function), and some builtin types, however, sometimes we want higher type: a type depends on type, e.g. `(list int)`(or Java like syntax `list<int>`). To define such type constructor we need to leave **type holes**(also called **type parameters**), we call such mechanism **polymorphism**. The most famous system call **Hindley-Milner system**(would call it HM in the following context) use an algorithm which can get types from any valid HM terms. HM is out standing since it no need type annotation. Though a program is strong typed but without type annotation can be harmful, the algorithm from HM is important for the concept **implicit**, which appearing in many advanced type systems.
+
+The core of HM is `infer` with **unification**. When we get an undecidable type, we didn't treat it as an error, but a distinguishable type hole. When we need to **merge** two types, we use `unify` to do **unification**, where replaced unbound type hole with new type. Notice that rebound type hole is unacceptable here. The following code is the complete implementation.
 
 ```rkt
 (define (occurs v t)
@@ -201,9 +209,11 @@ Application rule unify the `f` type with a new arrow(`->`) type which constructe
 
 Finally, let rule, which seems like not need, is quite important. In Racket, a possible transformation is `let` to `lambda`, however, in HM system they are different, an example: `((λ (id) (id "")) (λ (x) x))`, we all know the answer is `string`, but it cannot produce this caused by `id` has a free type. With `let` rule, we can have: `(let ([id (λ (x) x)]) (id ""))` and get `string` as expected, but notice that, we can make a trick: bind the inferred type to abstraction's parameter if it's an immediate application. Another way is introducing make polymorphism type can in the definition of parameter.
 
-### Dependent type
+Though I say rebound is unacceptable, in fact we can make several variants of type systems on this, by introducing **union type**, **higher rank type**, **row polymorphism**, we can get lots of fun.
 
-Dependent type is the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions(**Agda**):
+### For Fun: Dependent type
+
+In the end, for fun I would make a toy dependent type as the final part of this chapter, which means type can depend on term(value), or type is just a term. Under this perspective, we can have some interesting definitions(**Agda**):
 
 ```agda
 data Vec (A : Set a) : ℕ → Set a where
@@ -388,4 +398,4 @@ We can even make some proof!
 (+0/Nat)
 ```
 
-Notice the definition of `match` can only work for such simple case, it won't work with `? : Nat`, also lacking termination check which cannot be a safe definition.
+Notice the definition of `match` can only work for such simple case, it won't work with `? : Nat`, also lacking termination check which cannot be a safe definition. To get more information about termination, can search **recursor** or **guard predicate**(used by **Coq**).
