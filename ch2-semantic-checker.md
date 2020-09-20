@@ -222,7 +222,7 @@ In this case, `id` type should be instantiated before usage, else result type wo
 
 `list` are something like `'(1 2 3)`, `pair` are `(pair 1 2)`. In these cases, we return `(<list or pair> ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
 
-Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't know the type of parameter, therefore, given `?0`, `?1`, `?2` and so on. Then use new envionment to infer its body.
+Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't know the type of parameter, therefore, given `?0`, `?1`, `?2` and so on. Then create a new environment to infer its body.
 
 Application rule unify the `f` type with a new arrow(`->`) type which constructed by arguments' type, and a free type variable for return type. Then give final return type as its result.
 
