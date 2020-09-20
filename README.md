@@ -2,7 +2,7 @@
 
 ### Overview
 
-![](https://github.com/dannypsnl/write-a-programming-language/blob/master/language-overview.svg)
+![](https://github.com/dannypsnl/write-a-programming-language/blob/develop/language-overview.svg)
 
 ### Chapter
 
