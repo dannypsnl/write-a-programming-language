@@ -12,44 +12,6 @@
 (define (extend/env env v t)
   (hash-set env v t))
 
-; t: tree
-; ty: Type
-; env: environment map
-; return bool, #t for valid, #f for invalid
-(define (: t ty [env (make-immutable-hash)])
-  (cond
-    [(Int? t) (eq? ty 'Integer)]
-    [(Var? t) (eq? (lookup/type-of env (Var-name t)) ty)]
-    [(Struct/value? t)
-     (match ty
-       [`(struct ,name ,field-typ*)
-        (and (string=? name (Struct/value-struct-name t))
-             (andmap (λ (field-typ field-value)
-                       ; each field value should be valid member of field type
-                       (: field-value field-typ env))
-                     field-typ*
-                     (Struct/value-term* t)))]
-       [else #f])]
-    [(Func? t)
-     (let* ([v (Func-var t)]
-            [v-name (Var-name v)]
-            [v-typ (Var-typ v)])
-       (match ty
-         [`(-> ,param-typ ,return-typ)
-          (and (eqv? v-typ param-typ)
-               (: (Func-term t) return-typ (extend/env env v-name v-typ)))]
-         [else #f]))]
-    [(Func/call? t)
-     (let ([t1 (Func/call-term1 t)]
-           [t2 (Func/call-term2 t)])
-       (match (infer t1 env)
-         [`(-> ,param-typ ,return-typ)
-          (: t2 param-typ env)]
-         [else #f]))]))
-
-(: (Int 1) 'Integer)
-(: (Func (Var 'Integer 'x) (Var 'Integer 'x)) '(-> Integer Integer))
-
 (define (infer t [env (make-immutable-hash)])
   (cond
     [(Int? t) 'Integer]
@@ -71,5 +33,15 @@
             return-typ
             (error "type mismatch"))]
        [_ (error "call on non-arrow type")])]))
+
+; t: tree
+; ty: Type
+; env: environment map
+; return bool, #t for valid, #f for invalid
+(define (: t ty [env (make-immutable-hash)])
+  (equal? (infer t env) ty))
+
+(: (Int 1) 'Integer)
+(: (Func (Var 'Integer 'x) (Var 'Integer 'x)) '(-> Integer Integer))
 
 (infer (Func (Var 'Integer 'x) (Var 'Integer 'x)))

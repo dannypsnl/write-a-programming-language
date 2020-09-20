@@ -83,9 +83,33 @@ As the last case shows, `:` is not good enough, the problem is we can have deepe
        [_ (error "call on non-arrow type")])]))
 ```
 
-With `infer` we can improve `:` and make it work with sub-term with function(lambda)!
+With `infer` we can improve `:` since all it needs to do is: `(equal? (infer t env) ty)`.
 
 ```diff
+ (define (: t ty [env (make-immutable-hash)])
+-  (cond
+-    [(Int? t) (eq? ty 'Integer)]
+-    [(Var? t) (eq? (lookup/type-of env (Var-name t)) ty)]
+-    [(Struct/value? t)
+-     (match ty
+-       [`(struct ,name ,field-typ*)
+-        (and (string=? name (Struct/value-struct-name t))
+-             (andmap (λ (field-typ field-value)
+-                       ; each field value should be valid member of field type
+-                       (: field-value field-typ env))
+-                     field-typ*
+-                     (Struct/value-term* t)))]
+-       [else #f])]
+-    [(Func? t)
+-     (let* ([v (Func-var t)]
+-            [v-name (Var-name v)]
+-            [v-typ (Var-typ v)])
+-       (match ty
+-         [`(-> ,param-typ ,return-typ)
+-          (and (eqv? v-typ param-typ)
+-               (: (Func-term t) return-typ (extend/env env v-name v-typ)))]
+-         [else #f]))]
+-    [(Func/call? t)
 -     (if (Func? (Func/call-term1 t))
 -         (: (Func/call-term2 t) ; argument term should have function var required type
 -            (Var-typ (Func-var (Func? (Func/call-term1 t))))
@@ -93,12 +117,7 @@ With `infer` we can improve `:` and make it work with sub-term with function(lam
 -         ;;; although I should handle much more complicate example like (((lambda (x) (lambda (a) (+ a x))) 1) 2)
 -         ; but for simple, here just reject indirect function call
 -         #f)]))
-+     (let ([t1 (Func/call-term1 t)]
-+           [t2 (Func/call-term2 t)])
-+       (match (infer t1 env)
-+         [`(-> ,param-typ ,return-typ)
-+          (: t2 param-typ env)]
-+         [else #f]))]))
++  (equal? (infer t env) ty))
 ```
 
 ### Polymorphism
