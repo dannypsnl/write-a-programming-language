@@ -1,10 +1,35 @@
 #lang typed/racket
 
-(require "instruction.rkt")
 (require/typed "basic-block.rkt"
                [#:struct basic-block
                 ([inst* : (Listof inst)])]
                [basic-block-push! (-> basic-block inst Void)])
+
+(define-type Oprend (U Symbol Integer Boolean))
+
+(define-type Expr (U Oprend expr))
+(struct expr
+  ([a : Oprend]
+   [b : Oprend]) #:transparent)
+(struct + expr () #:transparent)
+(struct - expr () #:transparent)
+(struct * expr () #:transparent)
+(struct / expr () #:transparent)
+(struct = expr () #:transparent)
+(struct > expr () #:transparent)
+(struct < expr () #:transparent)
+(struct >= expr () #:transparent)
+(struct <= expr () #:transparent)
+
+(struct inst () #:transparent)
+(struct assign inst
+  ([var : Symbol]
+   [exp : Expr]) #:transparent)
+(struct jump inst
+  ([label : Symbol]
+   [cond : Expr]) #:transparent)
+(struct label inst
+  ([name : Symbol]) #:transparent)
 
 (: inst*->leader* (-> (Listof inst) (Listof Boolean)))
 (define (inst*->leader* inst*)
@@ -12,12 +37,11 @@
     (make-hash))
   (for ([inst inst*])
     (match inst
-      [(brz r t) (hash-set! jump-target* t #t)]
-      [(br t) (hash-set! jump-target* t #t)]
+      [(jump t cond) (hash-set! jump-target* t #t)]
       [else (void)]))
   (map (λ ([i : inst])
          (match i
-           [(tag name)
+           [(label name)
             (hash-ref jump-target* name #f)]
            [else #f]))
        (cdr inst*)))
@@ -38,13 +62,12 @@
   (append block* (list cur-block)))
 
 (define test-prog : (Listof inst)
-  (list (load 'r0 1)
-        (tag 'bar)
-        (op 'add 'r0 'r0 1)
-        (store 'r1 'r0)
-        (br 'foo)
-        (tag 'foo)
-        (brz 'r1 'bar)
-        (halt)))
+  (list (assign 'r0 1)
+        (label 'bar)
+        (assign 'r0 (+ 'r0 1))
+        (assign 'r1 'r0)
+        (jump 'foo #t)
+        (label 'foo)
+        (jump 'bar (= 'r1 0))))
 
 (inst*->basic-block* test-prog)
