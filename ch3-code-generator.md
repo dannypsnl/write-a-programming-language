@@ -23,6 +23,11 @@ Tree representation of a small IR.
 (- op op)
 (* op op)
 (/ op op)
+(= op op)
+(< op op)
+(> op op)
+(<= op op)
+(>= op op)
 ;;; op
 integer
 var
