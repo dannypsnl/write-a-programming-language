@@ -7,19 +7,19 @@
 
 (define-type Oprend (U Symbol Integer Boolean))
 
-(define-type Expr (U Oprend expr))
-(struct expr
+(define-type Expr (U Oprend Binary))
+(struct Binary
   ([a : Oprend]
    [b : Oprend]) #:transparent)
-(struct + expr () #:transparent)
-(struct - expr () #:transparent)
-(struct * expr () #:transparent)
-(struct / expr () #:transparent)
-(struct = expr () #:transparent)
-(struct > expr () #:transparent)
-(struct < expr () #:transparent)
-(struct >= expr () #:transparent)
-(struct <= expr () #:transparent)
+(struct + Binary () #:transparent)
+(struct - Binary () #:transparent)
+(struct * Binary () #:transparent)
+(struct / Binary () #:transparent)
+(struct = Binary () #:transparent)
+(struct > Binary () #:transparent)
+(struct < Binary () #:transparent)
+(struct >= Binary () #:transparent)
+(struct <= Binary () #:transparent)
 
 (struct inst () #:transparent)
 (struct assign inst
