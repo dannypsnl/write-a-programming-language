@@ -11,5 +11,23 @@ Tree representation of a small register based machine.
 (br cond to) ;;; 0 is false, else true
 ```
 
+Tree representation of a small IR.
+
+```rkt
+;;; statement
+(= var exp)
+(if cond goto-a-label)
+(label name)
+;;; exp
+(+ op op)
+(- op op)
+(* op op)
+(/ op op)
+;;; op
+integer
+var
+```
+
 ## X86
+
 ## LLVM
