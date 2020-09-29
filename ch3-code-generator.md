@@ -8,7 +8,7 @@ Tree representation of a small register based machine.
 (store dst src)
 (reg name)
 (br to)
-(br cond to) ;;; 0 is false, else true
+(brz cond to) ;;; 0 is false, else true
 ```
 
 Tree representation of a small IR.
