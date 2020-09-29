@@ -16,7 +16,7 @@ Tree representation of a small IR.
 ```rkt
 ;;; statement
 (= var exp)
-(if cond goto-a-label)
+(jump label-name cond?) ; optional condition
 (label name)
 ;;; exp
 (+ op op)
