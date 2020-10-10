@@ -1,38 +1,8 @@
 # Code Generator
 
-Tree representation of a small register based machine.
+There have many different kinds of IR(Intermediate Representation) in the world, but for convenience, I would only shows how to compile to a ASM like language. In such language, we will not have high-level conditional structure like **if**, **switch**, or repeated structure like **for**, **while**, one of our major tasks is using **goto** to build these high-level structures.
 
-```rkt
-(op dst a b) ;;; op can be: add, sub, mul, div
-(load dst src)
-(store dst src)
-(reg name)
-(br to)
-(brz cond to) ;;; 0 is false, else true
-```
-
-Tree representation of a small IR.
-
-```rkt
-;;; statement
-(= var exp)
-(jump label-name cond?) ; optional condition
-(label name)
-;;; exp
-(+ op op)
-(- op op)
-(* op op)
-(/ op op)
-(= op op)
-(< op op)
-(> op op)
-(<= op op)
-(>= op op)
-;;; op
-integer
-var
-```
-
-## X86
-
-## LLVM
+Generate **if** code is quite intuitive.
+1. **bool** use `0` for `false`, non `0` for `true`
+2. mark each block with a label
+TODO
