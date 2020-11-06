@@ -6,5 +6,8 @@ Originally, I follow most traditional course and trying to tell how to make a pr
 
 ### Chapter
 
-1. [parser](ch1-parser.md)
-2. [semantic checker](ch2-semantic-checker.md)
+[semantic checker](ch2-semantic-checker.md)
+
+### Appendix
+
+[parser](appendix-parser.md)
