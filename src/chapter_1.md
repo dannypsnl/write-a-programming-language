@@ -29,3 +29,5 @@ Or, we can just check it when compiling?
 (define (hello [name : String])
   (string-append "hello, " name))
 ```
+
+This is correct answer, if we only care about the runtime speed, more type(information), better output was possible. Unfortunately, from another perspective, compile time can be hurt. Runtime performance is not the only consideration, what does this mean? In language like **Coq**, **Agda**, proof a list has expected length in compile time is possible, but they might take a crazy long time to compile a small program. Simpler languages like **Rust**, **Haskell**, still known as having slow compiler, solve more problems in compile time make compile time longer. Designing language, means make a balance between these choose(include but not just compile time problem).
