@@ -17,3 +17,11 @@ Annoying, we know what is `1`, `#t`, and `#\c`. Since we have knowledge, we can 
     [(boolean? exp) 'Bool]
     [(char? exp) 'Char]))
 ```
+
+Then we only have to write:
+
+```racket
+(define i 1)
+(define b #t)
+(define c #\c)
+```
