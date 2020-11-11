@@ -5,5 +5,7 @@ multilingual = false
 src = "src"
 title = "Write You a Programming Language"
 
+[build]
+build-dir = "docs"
 [output.html]
 mathjax-support = true
