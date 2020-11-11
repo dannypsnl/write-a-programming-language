@@ -1,0 +1,735 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Write You a Programming Language</title>
+        
+        <meta name="robots" content="noindex" />
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Write You a Programming Language</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#overview" id="overview">Overview</a></h1>
+<p>Originally, I follow most traditional course and trying to tell how to make a programming language from technology view, but I quickly found how wrong this way. Because we already have a lot of language, another bad language is not need. Existed tutorials already enough to help anyone make a compiler, but how to design a good language is a question, you would usually need to read tons of books in PLT(Programming Language Theory) this area, and be carefully to avoid be killed by math. I won't try to say what I made is the best, but giving a lot of independent features, and let readers feel the core concept behind them to help readers make a good design.</p>
+<h1><a class="header" href="#type-checking" id="type-checking">Type Checking</a></h1>
+<p>Without type checking, program still works. Oh! Then why type checking? They spent times, right? Yes, type checking use more resource if we <strong>always</strong> make correct software. Unfortunately, we don't. For example, we might exceptionally write:</p>
+<pre><code class="language-racket">(string-append &quot;hello, &quot; 1)
+</code></pre>
+<p>That's ridiculous, but if <code>(define (hello name) (string-append &quot;hello, &quot; name))</code>? The previous program can happen, when we didn't write:</p>
+<pre><code class="language-racket">(define (hello name)
+  (when (string? name)
+    (string-append &quot;hello, &quot; name)))
+</code></pre>
+<p>This time we always have a string, ignores others, but maybe we would like to know this function failed?</p>
+<pre><code class="language-racket">(define (hello name)
+  (if (string? name)
+    (string-append &quot;hello, &quot; name)
+    (error 'hello &quot;name should be a string!&quot;)))
+</code></pre>
+<p>Or, we can just check it when compiling?</p>
+<pre><code class="language-racket">(define (hello [name : String])
+  (string-append &quot;hello, &quot; name))
+</code></pre>
+<p>This is correct answer, if we only care about the runtime speed, more type(information), better output was possible. Unfortunately, from another perspective, compile time can be hurt. Runtime performance is not the only consideration, what does this mean? In language like <strong>Coq</strong>, <strong>Agda</strong>, proof a list has expected length in compile time is possible, but they might take a crazy long time to compile a small program. Simpler languages like <strong>Rust</strong>, <strong>Haskell</strong>, still known as having slow compiler, solve more problems in compile time make compile time longer. Designing language, means make a balance between these choose(include but not just compile time problem).</p>
+<h1><a class="header" href="#type-inference" id="type-inference">Type Inference</a></h1>
+<p>With type, we need to define all our variable like the following code:</p>
+<pre><code class="language-racket">(define i : Number 1)
+(define b : Bool #t)
+(define c : Char #\c)
+</code></pre>
+<p>Annoying, we know what is <code>1</code>, <code>#t</code>, and <code>#\c</code>. Since we have knowledge, we can create a compiler find types for you:</p>
+<pre><code class="language-racket">(define (infer-type exp)
+  (cond
+    [(number? exp) 'Number]
+    [(boolean? exp) 'Bool]
+    [(char? exp) 'Char]))
+</code></pre>
+<p>Then we only have to write:</p>
+<pre><code class="language-racket">(define i 1)
+(define b #t)
+(define c #\c)
+</code></pre>
+<h1><a class="header" href="#lambda-calculus" id="lambda-calculus">Lambda Calculus</a></h1>
+<p><strong>lambda calculus</strong> created by three rules</p>
+<ul>
+<li>variable \[ x \]</li>
+<li>abstraction \[ \lambda x.M \]</li>
+<li>application \[ M \ N \]</li>
+</ul>
+<p>With two types: <strong>Base type</strong> and <strong>Arrow type</strong>, <strong>lambda calculus</strong> became <strong>Simply typed lambda calculus(STLC)</strong>, the most important property of <strong>STLC</strong> was strong normalization, which means it produces type for all terms.</p>
+<p><strong>STLC</strong> puts type rules in to system, where points out an abstraction \( \lambda x : A.M \) has type \( A \to B \) if \( M \) has type \( B \), and application \( M \ N \) get type \( B \) if \(M\) has type \(A \to B\) and \(N\) has type \(A\).</p>
+<h1><a class="header" href="#polymorphism--advanced-type-inference" id="polymorphism--advanced-type-inference">Polymorphism &amp; Advanced Type Inference</a></h1>
+<p>Polymorphism has <strong>Ad hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
+<h1><a class="header" href="#parser" id="parser">Parser</a></h1>
+<p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
+but practical language usually didn't need the complex techiology. But at here I still would list the common tools
+would be there for developing a Parser.</p>
+<p>Before that, we must know why we need the Parser, the Parser was a tool to translate the language in our mind into another
+language to run on certain environment. The most common example was compiler compile the language to assembly, but why
+assembly language? Because the environment in case was OS provide the tool called assembler which can translate assembly
+to machine code which can run on the real machine(or more specific, run by CPU). Or like TypeScript, Elm and GHCJs compile
+the origin language to another high-level language JavaScript.</p>
+<p>So the point was we would like to run a program, and we would find out how to run it on our target platform. When you learn
+these stuffs, I believe there are many resources keep mention AST. But what's AST? AST was abstract syntax tree, or to be
+honestly, our real language. Sure, the syntax was not language, or at least just the outlooking part. The all important things
+are our mind concept, and the language just a way to express our mind with some trade-off. What trade-off? For example a
+language can write:</p>
+<pre><code>print hello, world
+</code></pre>
+<p>Of course was possible, however, would be hard to read in more complex place. So rather than make Compiler handles it, we
+choose to let people(programmer) handles <code>string</code>. Now the code became:</p>
+<pre><code>print &quot;hello, world&quot;
+</code></pre>
+<p>It looks more clear. But the example can be more complex,
+remember currently we are say <code>print</code> takes <code>&quot;hello, world&quot;</code> to do something, now we extend the example:</p>
+<pre><code>print &quot;hello, &quot; user_input
+</code></pre>
+<p><code>user_input</code> was another function which get input from user, no matter how did it work, now we have trouble:
+We should <strong>print</strong> <code>hello, &lt;function&gt;</code> or <code>hello, Danny</code>(if user type in <code>Danny</code>)?</p>
+<p>In fact, compiler can not do the decision for you, whatever which behavior it picked would make functionality missing.
+Sometimes we are really want to print out the function value. So we introduce parenthesis in case:</p>
+<pre><code>print(&quot;hello, &quot;, user_input())
+# or
+print &quot;hello, &quot; (user_input)
+</code></pre>
+<p>The first one was picked by C family, and second one was using by ML family, both has cons and pros. We would keep mention
+these issues.</p>
+<h2><a class="header" href="#simple-parser-and-why-we-have-next-section" id="simple-parser-and-why-we-have-next-section">Simple parser and why we have next section</a></h2>
+<p>In this section we would use Perl6 to build a parser. Parser can be generated? Sure, but I do not recommend it in production. But for simple stuff it was fine.</p>
+<p>Here we were going to talk about natural number arithmetic syntax which supprts plus: <code>+</code>, times(multiple): <code>*</code>, minus: <code>-</code> and divide: <code>/</code>.</p>
+<pre><code class="language-perl6">grammar Calculator {
+    token TOP { &lt;calc-op&gt; }
+
+    proto rule calc-op          {*}
+          rule calc-op:sym&lt;mult&gt; { &lt;num&gt; '*' &lt;num&gt; }
+          rule calc-op:sym&lt;div&gt; { &lt;num&gt; '/' &lt;num&gt; }
+          rule calc-op:sym&lt;add&gt; { &lt;num&gt; '+' &lt;num&gt; }
+          rule calc-op:sym&lt;sub&gt; { &lt;num&gt; '-' &lt;num&gt; }
+    # just like regex, \d+ is at least one digit
+    token num { \d+ }
+}
+</code></pre>
+<p>This is a very short syntax, even C lanugage syntax has 954 lines: https://github.com/antlr/grammars-v4/blob/master/c/C.g4 , cpp even has 1940 lines: https://github.com/antlr/grammars-v4/blob/master/cpp/CPP14.g4 in Antlr4(another parser generator).</p>
+<p>Forget about that, at here code generator was really useful, we can quickly generate the Parser for our purpose. Then we can create an interpreter based on it:</p>
+<pre><code class="language-perl6">class Calculations {
+    method TOP              ($/) { make $&lt;calc-op&gt;.made; }
+    # if you are not familiar with Perl just like me, notice that `calc-op` mapping to each grammar
+    method calc-op:sym&lt;mult&gt; ($/) { make [*] $&lt;num&gt; }
+    method calc-op:sym&lt;div&gt; ($/) { make [/] $&lt;num&gt; }
+    method calc-op:sym&lt;add&gt; ($/) { make [+] $&lt;num&gt;; }
+    method calc-op:sym&lt;sub&gt; ($/) { make [-] $&lt;num&gt;; }
+}
+
+say '2+2 = ' ~ Calculator.parse('2+2', actions =&gt; Calculations).made;
+say '2*3 = ' ~ Calculator.parse('2*3', actions =&gt; Calculations).made;
+</code></pre>
+<p>This one basically not good enough, it can't handle parentheses, can't handle <code>2 * 2 + 3</code>. But anyway shows how interpreter work.</p>
+<p>Now consider a manual parser, how would it looks like? It actually easy to build up. Consider the following Java program:</p>
+<pre><code class="language-java">Scanner s = new Scanner(input);
+StringBuilder number = new StringBuilder(&quot;&quot;);
+char c = s.next().charAt(0);
+while (Character.isDigit(c)) {
+    number.append(c);
+    c = s.next().charAt(0);
+}
+// now c must not a digit
+while (Character.isSpace(c)) {
+    c = s.next().charAt(0); // skip whitespace
+}
+if (c == '+') {
+    c = s.next().charAt(0);
+} else {
+    throw new SyntaxException(&quot;allow + operator only&quot;);
+}
+while (Character.isSpace(c)) {
+    c = s.next().charAt(0); // skip whitespace
+}
+StringBuilder number2 = new StringBuilder(&quot;&quot;);
+char c = s.next().charAt(0);
+while (Character.isDigit(c)) {
+    number2.append(c);
+    c = s.next().charAt(0);
+}
+return new BinaryExpression(number, number2, Operator(&quot;+&quot;));
+</code></pre>
+<p>This is of course too exaggerated, but can show why handling input stream is not a good idea. That's why we introduce Lexer layer.</p>
+<h2><a class="header" href="#lexer" id="lexer">Lexer</a></h2>
+<p>Lexer is an optional, the correct way to describe it was a helper component, we would need it when the token was trying to reduce the concept we have to consider. If we don't use lexer, when we parsing</p>
+<pre><code>class Foo {}
+</code></pre>
+<p>we could write down:</p>
+<pre><code class="language-py">identifier = take_char_until_one_of([' ', '\n'])
+if identifier == &quot;class&quot;:
+    name_of_class = take_char_until_one_of([' ', '\n'])
+    require('{')
+    require('}')
+else:
+    # parse different rule
+</code></pre>
+<p>Which was very low-level program, we have to handle each space and newline and remember when we don't need them. For many language we can extract out lexer/tokenizer to do these. The idea was we don't have to directly work with string, but with token, a token could contain <code>location</code>, <code>content</code>, <code>type</code> these information to help parser keep doing the parsing. A lexer can directly skip whitespace and newline, update location information and normalize the content of token(for example we can parse int or parse float before the token sent to parser).</p>
+<p>Here, I show a naive Lexer written in Rust:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// first need to define Location
+#[derive(Clone, Debug)]
+struct Location {
+    file_name: String,
+    // line, column is the pair of location, use start point of token
+    line: u32,
+    column: u32,
+    // start, end is the start offset to end offset for a token, for example: `let` at 0 has start: 0 and end: 3
+    start: u32,
+    end: u32,
+}
+
+impl Location {
+    pub fn new&lt;T: ToString&gt;(
+        file_name: T,
+        line: u32,
+        column: u32,
+        start: u32,
+        end: u32,
+    ) -&gt; Location {
+        Location {
+            file_name: file_name.to_string(),
+            line,
+            column,
+            start,
+            end,
+        }
+    }
+}
+
+// then need some Token Type
+#[derive(Clone, Debug, PartialEq)]
+enum TkType {
+    EOF,
+    Identifier,
+    KeywordLet,
+    Integer,
+}
+
+// A Token has location, type and value
+struct Token(Location, TkType, String);
+
+// A lexer moving between states, by each state has a behavior produce new state, and at the end must reach EOF to complete tokenizing, ok, so we can have such definition:
+enum State {
+    Fn(fn(&amp;mut Lexer) -&gt; State),
+    EOF,
+}
+
+// Now define Lexer
+struct Lexer {
+    file_name: String,
+    code: Vec&lt;char&gt;,
+    tokens: Vec&lt;Token&gt;,
+    state_fn: State,
+    start: usize,
+    offset: usize,
+    // (line, pos) represent the position for user
+    pos: u32,
+    line: u32,
+}
+
+// several helpers
+impl Lexer {
+    fn new&lt;T: Into&lt;String&gt;&gt;(file_name: T, code: T) -&gt; Lexer {
+        Lexer {
+            file_name: file_name.into(),
+            code: code.into().chars().collect(),
+            tokens: vec![],
+            state_fn: State::Fn(whitespace),
+            start: 0,
+            offset: 0,
+            pos: 0,
+            line: 1, // line start from 1
+        }
+    }
+
+    fn ignore(&amp;mut self) {
+        self.pos += (self.offset - self.start) as u32;
+        self.start = self.offset;
+    }
+    fn peek(&amp;self) -&gt; Option&lt;char&gt; {
+        match self.code.get(self.offset) {
+            Some(c) =&gt; Some(*c),
+            None =&gt; None,
+        }
+    }
+    fn next(&amp;mut self) -&gt; Option&lt;char&gt; {
+        self.offset += 1;
+        self.peek()
+    }
+    fn new_token(&amp;mut self, token_type: TkType, value: String) -&gt; Token {
+        Token(
+            Location::new(
+                self.file_name.clone(),
+                self.line,
+                self.pos,
+                self.start as u32,
+                self.offset as u32,
+            ),
+            token_type,
+            value,
+        )
+    }
+    fn emit(&amp;mut self, token_type: TkType) {
+        let s: String = self.code[self.start..self.offset].into_iter().collect();
+        let tok = match s.as_str() {
+            &quot;let&quot; =&gt; self.new_token(TkType::KeywordLet, s),
+            _ =&gt; self.new_token(token_type.clone(), s),
+        };
+        self.tokens.push(tok);
+        self.ignore();
+    }
+}
+
+fn whitespace(lexer: &amp;mut Lexer) -&gt; State {
+    while let Some(c) = lexer.peek() {
+        if c == ' ' || c == '\r' || c == '\n' {
+            if c == '\n' {
+                lexer.next();
+                lexer.start = lexer.offset;
+                lexer.pos = 0;
+                lexer.line += 1;
+            } else {
+                lexer.next();
+            }
+        } else {
+            break;
+        }
+    }
+    lexer.ignore();
+
+    match lexer.peek() {
+        Some(_c @ '0'..='9') =&gt; State::Fn(number),
+        Some(c) =&gt; {
+            if in_identifier_set(c) {
+                State::Fn(ident)
+            } else {
+                unimplemented!(&quot;char: `{}`&quot;, c);
+            }
+        }
+        None =&gt; State::EOF,
+    }
+}
+
+fn in_identifier_set(c: char) -&gt; bool {
+    c.is_alphanumeric() || c == '_'
+}
+fn ident(lexer: &amp;mut Lexer) -&gt; State {
+    while let Some(c) = lexer.next() {
+        if !in_identifier_set(c) {
+            break;
+        }
+    }
+    lexer.emit(TkType::Identifier);
+    State::Fn(whitespace)
+}
+fn number(lexer: &amp;mut Lexer) -&gt; State {
+    while let Some(c) = lexer.next() {
+        if !c.is_digit(10) {
+            break;
+        }
+    }
+    lexer.emit(TkType::Integer);
+    State::Fn(whitespace)
+}
+
+pub fn lex&lt;T: Into&lt;String&gt;&gt;(file_name: T, source: T) -&gt; Vec&lt;Token&gt; {
+    let mut lexer = Lexer::new(file_name, source);
+    // tokenizing is just moving between state when possible
+    while let State::Fn(f) = lexer.state_fn {
+        lexer.state_fn = f(&amp;mut lexer);
+    }
+    // emit final EOF to help Parser report EOF problem(optional, also can use no more token as EOF)
+    lexer.emit(TkType::EOF);
+    lexer.tokens
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#manual-parser" id="manual-parser">Manual parser</a></h2>
+<p>A manual parser is powerful, but on the other hand it takes a lot of effort. Before you jump into writing a manual parser and never go back again, ensure that parser generator cannot handle your case.</p>
+<p>Write a manual parser didn't need many parsing background knowledge, surprising, but heavy repetitive work. Because simply porting <strong>LL</strong> syntax can handle about 90% job. For example, an assignment syntax <code>&lt;type&gt; &lt;name&gt; = &lt;expr&gt;;</code> can use the following parser:</p>
+<pre><code class="language-py">typ = parse_type()
+name = parse_identifier()
+expect_symbol('=')
+expr = parse_expr()
+expect_symbol(';')
+return Assign(typ=typ, name=name, expr=expr)
+</code></pre>
+<p>However, there has an annoying case: <strong>expression parsing</strong>. How this became the big problem for newbies? If we follow <strong>LL</strong> strict conversion from syntax as below:</p>
+<pre><code class="language-bnf">expr ::=
+  expr &quot;*&quot; expr
+  | expr &quot;+&quot; expr
+  | // ignore others
+</code></pre>
+<p>the conversion is:</p>
+<pre><code class="language-py">def parse_expr():
+    left_expr = parse_expr()
+    op = expect_oneof('*', '+')
+    right_expr = parse_expr()
+    return BinaryExpression(left_expr, op, right_expr)
+</code></pre>
+<p>This is <strong>left recursive</strong>, your parser would keep calling <code>parse_expr</code> and never end(or stack overflow, depend on which language you're using).</p>
+<p>Clever as you, might thought out how to fix this quickly:</p>
+<pre><code class="language-bnf">expr ::=
+  integer &quot;*&quot; expr
+  | integer &quot;+&quot; expr
+  | integer
+</code></pre>
+<p>here is conversion:</p>
+<pre><code class="language-py">def parse_expr():
+    left_expr = parse_integer()
+    try:
+        op = expect_oneof('*', '+')
+        try:
+            right_expr = parse_expr()
+            return BinaryExpression(left_expr, op, right_expr)
+        except:
+            # keep throw up the parse error
+            raise
+    except:
+        # to simplify example, assuming `expect_oneof` is under the control and won't throw unexpected exception
+        # no right hand side expression
+        return left_expr
+</code></pre>
+<p>It would work, until you have to handle <strong>operator precedence</strong>. For example, <code>*</code> would usually be applied before <code>+</code>. As clever as you, get the solution quickly again:</p>
+<pre><code class="language-bnf">expr ::=
+  term &quot;*&quot; expr
+  | term
+term ::=
+  integer &quot;+&quot; expr
+  | integer
+</code></pre>
+<p>However, the implementation work became quick heavy now.</p>
+<p>To solve all problem in once, we need a better way to handle this, and that is operator precedence parser(provided by Wiki):</p>
+<pre><code>parse_expression()
+    return parse_expression_1(parse_primary(), 0)
+parse_expression_1(lhs, min_precedence)
+    lookahead := peek next token
+    while lookahead is a binary operator whose precedence is &gt;= min_precedence
+        op := lookahead
+        advance to next token
+        rhs := parse_primary ()
+        lookahead := peek next token
+        while lookahead is a binary operator whose precedence is greater
+                 than op's, or a right-associative operator
+                 whose precedence is equal to op's
+            rhs := parse_expression_1 (rhs, lookahead's precedence)
+            lookahead := peek next token
+        lhs := the result of applying op with operands lhs and rhs
+    return lhs
+</code></pre>
+<h2><a class="header" href="#combinator" id="combinator">Combinator</a></h2>
+<p>Finally, my favourite technology is combinator, here is the reason:</p>
+<pre><code class="language-racket">#lang racket
+
+(require data/monad data/applicative) ;;; raco pkg install functional-lib
+(require megaparsack megaparsack/text) ;;; raco pkg install megaparsack
+
+(define lexeme/p
+  ;;; lexeme would take at least one space or do nothing
+  (do (or/p (many+/p space/p) void/p)
+    (pure (λ () 'lexeme))))
+(define (keyword/p keyword)
+  (do (string/p keyword)
+    (lexeme/p)
+    (pure keyword)))
+(define identifier/p
+  (do [id &lt;- (many+/p letter/p)]
+    (lexeme/p)
+    (pure (list-&gt;string id))))
+(define (type/p ctx)
+  (do [check-struct &lt;- (or/p (keyword/p &quot;struct&quot;) void/p)]
+    [typ &lt;- identifier/p]
+    (pure ((λ ()
+             (context/lookup-type-id ctx typ (eqv? check-struct &quot;struct&quot;)))))))
+
+(define (struct-field/p ctx)
+  (do [field &lt;- (list/p (type/p ctx) identifier/p)]
+    (char/p #\;)
+    (lexeme/p)
+    (pure field)))
+(define (struct-def/p ctx)
+  (do (keyword/p &quot;struct&quot;)
+    [name &lt;- identifier/p]
+    (char/p #\{)
+    (lexeme/p)
+    [fields &lt;- (many/p (struct-field/p ctx))]
+    (lexeme/p)
+    (char/p #\})
+    (pure ((λ ()
+             (context/new-type ctx name (CStruct name fields))
+             (CStructDef name fields))))))
+</code></pre>
+<p>This just show how to parse a C structure definition using Racket combinator lib: <code>megaparsack</code>. Basically just as BNF definition, but with action easier and still using original language is the point.</p>
+<p>Quickly the problem would be how to make operator precedence parsing, because combinator doesn't good at loop directly, however, combinator good at recursive:</p>
+<pre><code class="language-racket">#lang racket
+
+(require data/monad data/applicative)
+(require megaparsack megaparsack/text)
+
+(define lexeme/p
+  ;;; lexeme would take at least one space or do nothing
+  (do (or/p (many+/p space/p) void/p)
+    (pure (λ () 'lexeme))))
+
+(define (op/p op-list)
+  (or/p (one-of/p op-list)
+        void/p))
+(define factor/p
+  (do [expr &lt;- integer/p]
+    (lexeme/p)
+    (pure expr)))
+(define (binary/p high-level/p op-list)
+  (do [e &lt;- high-level/p]
+    ; `es` parse operator then high-level unit, for example, `* 1`.
+    ; therefore, this parser would stop when the operator is not expected(aka. operator is in op-list)
+    ; rely on this fact we can leave this loop
+    [es &lt;- (many/p (do [op &lt;- (op/p op-list)]
+                     (lexeme/p)
+                     [e &lt;- high-level/p]
+                     (pure (list op e))))]
+    (pure (foldl
+           (λ (op+rhs lhs)
+             (match op+rhs
+               [(list op rhs)
+                (list op lhs rhs)]))
+           e es))))
+(define (table/p base/p list-of-op-list)
+  (if (empty? list-of-op-list)
+      base/p
+      (table/p (binary/p base/p (car list-of-op-list))
+               (cdr list-of-op-list))))
+(define expr/p
+  (table/p factor/p
+           '((#\* #\/)
+             (#\+ #\-))))
+</code></pre>
+<p>The code shows how to define table parser, and it even more simple to extend, all we need to do is just add new operator list into the table.</p>
+<h2><a class="header" href="#conclusion" id="conclusion">Conclusion</a></h2>
+<p>Now we already shows all technologies for parsing(at least, what I know), now you can make some simple language by your own, but let me warn you: make a language doesn't easy, make it be runnable is just the first step, you need to make editor plugin(and we can't naively rely on parser I tell you here, since they cannot partially handle syntax), powerful debugger, profiler, and many other things to help people work on this language productively.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
