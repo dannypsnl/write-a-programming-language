@@ -1,0 +1,3 @@
+# Subtyping
+
+**Subtyping** is subtyping.

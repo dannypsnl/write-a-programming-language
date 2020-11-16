@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 3: Lambda Calculus - Write You a Programming Language</title>
+        <title>Chapter 4-3: Subtyping - Write You a Programming Language</title>
         
         
 
@@ -18,28 +18,28 @@
         <meta name="theme-color" content="#ffffff" />
 
         
-        <link rel="icon" href="favicon.svg">
+        <link rel="icon" href="../favicon.svg">
         
         
-        <link rel="shortcut icon" href="favicon.png">
+        <link rel="shortcut icon" href="../favicon.png">
         
-        <link rel="stylesheet" href="css/variables.css">
-        <link rel="stylesheet" href="css/general.css">
-        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
         
-        <link rel="stylesheet" href="css/print.css" media="print">
+        <link rel="stylesheet" href="../css/print.css" media="print">
         
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
         
-        <link rel="stylesheet" href="fonts/fonts.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
         
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
         
@@ -52,7 +52,7 @@
     <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
-            var path_to_root = "";
+            var path_to_root = "../";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html" class="active"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="../chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="../chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="../chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="../chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="../ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="../ch4/subtyping.html" class="active"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="../appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,7 +134,7 @@
 
                     <div class="right-buttons">
                         
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
                         
@@ -166,28 +166,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#lambda-calculus" id="lambda-calculus">Lambda Calculus</a></h1>
-<p><strong>lambda calculus</strong> created by three rules</p>
-<ul>
-<li>variable \[ x \]</li>
-<li>abstraction \[ \lambda x.M \]</li>
-<li>application \[ M \ N \]</li>
-</ul>
-<p>With two types: <strong>Base type</strong> and <strong>Arrow type</strong>, <strong>lambda calculus</strong> became <strong>Simply typed lambda calculus(STLC)</strong>, the most important property of <strong>STLC</strong> was strong normalization, which means it produces type for all terms.</p>
-<p><strong>STLC</strong> puts type rules in to system, where points out an abstraction \( \lambda x : A.M \) has type \( A \to B \) if \( M \) has type \( B \), and application \( M \ N \) get type \( B \) if \(M\) has type \(A \to B\) and \(N\) has type \(A\).</p>
+                        <h1><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h1>
+<p><strong>Subtyping</strong> is subtyping.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="chapter_2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../ch4/parametric-poly.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="chapter_4.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../appendix_parser.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -199,13 +192,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="chapter_2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../ch4/parametric-poly.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="chapter_4.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../appendix_parser.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -228,14 +221,14 @@
         
 
         
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
         
 
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
         

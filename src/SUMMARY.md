@@ -8,6 +8,9 @@
 - [Chapter 2: Type Inference](./chapter_2.md)
 - [Chapter 3: Lambda Calculus](./chapter_3.md)
 - [Chapter 4: Polymorphism & Advanced Type Inference](./chapter_4.md)
+  - [Chapter 4-1: Ad-hoc polymorphism](./ch4/ad-hoc-poly.md)
+  - [Chapter 4-2: Parametric polymorphism](./ch4/parametric-poly.md)
+  - [Chapter 4-3: Subtyping](./ch4/subtyping.md)
 
 # Appendix
 

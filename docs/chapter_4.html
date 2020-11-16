@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html" class="active"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html" class="active"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -168,48 +168,6 @@
                     <main>
                         <h1><a class="header" href="#polymorphism--advanced-type-inference" id="polymorphism--advanced-type-inference">Polymorphism &amp; Advanced Type Inference</a></h1>
 <p>Polymorphism has <strong>Ad-hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
-<h3><a class="header" href="#ad-hoc-polymorphism" id="ad-hoc-polymorphism">Ad-hoc polymorphism</a></h3>
-<p><strong>Ad-hoc</strong> is overloading, in Haskell we call it <code>class</code>, in Java we have overload function, there has no different down to the core. This feature allows a function definition works with different type. Two concrete approaches(Haskell and Java style) looks different at first:</p>
-<ul>
-<li>
-<p>Haskell version</p>
-<pre><code class="language-haskell">class Countable a where
-  count :: a -&gt; Int
-
-instance Countable [a] where
-  count lst = length lst
-
-instance Countable Human where
-  count Human { age=age } = age
-</code></pre>
-</li>
-<li>
-<p>Java version</p>
-<pre><code class="language-java">int count(List&lt;T&gt; lst) { return lst.size(); }
-int count(Human h) { return h.getAge(); }
-</code></pre>
-</li>
-</ul>
-<p>Both implemented by the same way:</p>
-<ol>
-<li>using encoding duplicate functions' name(ignore parametric polymorphism for now) and record these <strong>instances</strong>, for example:
-<ul>
-<li>Haskell get: <code>Countable.[a].count :: [a] -&gt; Int</code>, <code>Countable.Human.count :: Human -&gt; Int</code></li>
-<li>Java get: <code>count_List&lt;T&gt;</code>, <code>count_Human</code></li>
-</ul>
-</li>
-<li>search <strong>instances</strong> for function call, for example:
-<ul>
-<li><code>count [1, 2, 3]</code> get <code>Countable.[a].count :: [a] -&gt; Int</code></li>
-<li><code>count 1</code> get nothing and hence get an error</li>
-</ul>
-</li>
-</ol>
-<p>How about dynamic typing? Dynamic typed language still implements ad-hoc since they simply accept all types, which means the previous two-steps method didn't need by them, but the cost is them would crash in runtime if no <strong>instance</strong>.</p>
-<h3><a class="header" href="#parametric-polymorphism" id="parametric-polymorphism">Parametric polymorphism</a></h3>
-<p><strong>Parametric polymorphism</strong> is generic.</p>
-<h3><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h3>
-<p><strong>Subtyping</strong> is subtyping.</p>
 
                     </main>
 
@@ -222,7 +180,7 @@ int count(Human h) { return h.getAge(); }
                         
 
                         
-                            <a rel="next" href="appendix_parser.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="ch4/ad-hoc-poly.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -240,7 +198,7 @@ int count(Human h) { return h.getAge(); }
                 
 
                 
-                    <a rel="next" href="appendix_parser.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="ch4/ad-hoc-poly.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

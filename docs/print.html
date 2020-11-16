@@ -100,7 +100,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">6.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -219,7 +219,7 @@
 <p><strong>STLC</strong> puts type rules in to system, where points out an abstraction \( \lambda x : A.M \) has type \( A \to B \) if \( M \) has type \( B \), and application \( M \ N \) get type \( B \) if \(M\) has type \(A \to B\) and \(N\) has type \(A\).</p>
 <h1><a class="header" href="#polymorphism--advanced-type-inference" id="polymorphism--advanced-type-inference">Polymorphism &amp; Advanced Type Inference</a></h1>
 <p>Polymorphism has <strong>Ad-hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
-<h3><a class="header" href="#ad-hoc-polymorphism" id="ad-hoc-polymorphism">Ad-hoc polymorphism</a></h3>
+<h1><a class="header" href="#ad-hoc-polymorphism" id="ad-hoc-polymorphism">Ad-hoc polymorphism</a></h1>
 <p><strong>Ad-hoc</strong> is overloading, in Haskell we call it <code>class</code>, in Java we have overload function, there has no different down to the core. This feature allows a function definition works with different type. Two concrete approaches(Haskell and Java style) looks different at first:</p>
 <ul>
 <li>
@@ -257,9 +257,9 @@ int count(Human h) { return h.getAge(); }
 </li>
 </ol>
 <p>How about dynamic typing? Dynamic typed language still implements ad-hoc since they simply accept all types, which means the previous two-steps method didn't need by them, but the cost is them would crash in runtime if no <strong>instance</strong>.</p>
-<h3><a class="header" href="#parametric-polymorphism" id="parametric-polymorphism">Parametric polymorphism</a></h3>
+<h1><a class="header" href="#parametric-polymorphism" id="parametric-polymorphism">Parametric polymorphism</a></h1>
 <p><strong>Parametric polymorphism</strong> is generic.</p>
-<h3><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h3>
+<h1><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h1>
 <p><strong>Subtyping</strong> is subtyping.</p>
 <h1><a class="header" href="#parser" id="parser">Parser</a></h1>
 <p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
