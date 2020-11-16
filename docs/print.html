@@ -218,7 +218,49 @@
 <p>With two types: <strong>Base type</strong> and <strong>Arrow type</strong>, <strong>lambda calculus</strong> became <strong>Simply typed lambda calculus(STLC)</strong>, the most important property of <strong>STLC</strong> was strong normalization, which means it produces type for all terms.</p>
 <p><strong>STLC</strong> puts type rules in to system, where points out an abstraction \( \lambda x : A.M \) has type \( A \to B \) if \( M \) has type \( B \), and application \( M \ N \) get type \( B \) if \(M\) has type \(A \to B\) and \(N\) has type \(A\).</p>
 <h1><a class="header" href="#polymorphism--advanced-type-inference" id="polymorphism--advanced-type-inference">Polymorphism &amp; Advanced Type Inference</a></h1>
-<p>Polymorphism has <strong>Ad hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
+<p>Polymorphism has <strong>Ad-hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
+<h3><a class="header" href="#ad-hoc-polymorphism" id="ad-hoc-polymorphism">Ad-hoc polymorphism</a></h3>
+<p><strong>Ad-hoc</strong> is overloading, in Haskell we call it <code>class</code>, in Java we have overload function, there has no different down to the core. This feature allows a function definition works with different type. Two concrete approaches(Haskell and Java style) looks different at first:</p>
+<ul>
+<li>
+<p>Haskell version</p>
+<pre><code class="language-haskell">class Countable a where
+  count :: a -&gt; Int
+
+instance Countable [a] where
+  count lst = length lst
+
+instance Countable Human where
+  count Human { age=age } = age
+</code></pre>
+</li>
+<li>
+<p>Java version</p>
+<pre><code class="language-java">int count(List&lt;T&gt; lst) { return lst.size(); }
+int count(Human h) { return h.getAge(); }
+</code></pre>
+</li>
+</ul>
+<p>Both implemented by the same way:</p>
+<ol>
+<li>using encoding duplicate functions' name(ignore parametric polymorphism for now) and record these <strong>instances</strong>, for example:
+<ul>
+<li>Haskell get: <code>Countable.[a].count :: [a] -&gt; Int</code>, <code>Countable.Human.count :: Human -&gt; Int</code></li>
+<li>Java get: <code>count_List&lt;T&gt;</code>, <code>count_Human</code></li>
+</ul>
+</li>
+<li>search <strong>instances</strong> for function call, for example:
+<ul>
+<li><code>count [1, 2, 3]</code> get <code>Countable.[a].count :: [a] -&gt; Int</code></li>
+<li><code>count 1</code> get nothing and hence get an error</li>
+</ul>
+</li>
+</ol>
+<p>How about dynamic typing? Dynamic typed language still implements ad-hoc since they simply accept all types, which means the previous two-steps method didn't need by them, but the cost is them would crash in runtime if no <strong>instance</strong>.</p>
+<h3><a class="header" href="#parametric-polymorphism" id="parametric-polymorphism">Parametric polymorphism</a></h3>
+<p><strong>Parametric polymorphism</strong> is generic.</p>
+<h3><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h3>
+<p><strong>Subtyping</strong> is subtyping.</p>
 <h1><a class="header" href="#parser" id="parser">Parser</a></h1>
 <p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
 but practical language usually didn't need the complex techiology. But at here I still would list the common tools
