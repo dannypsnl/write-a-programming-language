@@ -290,7 +290,13 @@ int count(Human h) { return h.getAge(); }
 </code></pre>
 <p>However, problem of <strong>Generate</strong> method is obviously, it produces larger binary, and the performance issue of <strong>Dynamic</strong> method can be solved by JIT.</p>
 <h1><a class="header" href="#subtyping" id="subtyping">Subtyping</a></h1>
-<p><strong>Subtyping</strong> is subtyping.</p>
+<p><strong>Subtyping</strong> is a predicate between two types, describe a type can be treat as another type. Its formal syntax usually looked like this: <code>A &lt;: B</code>(<code>A</code> is subtype of <code>B</code>), which means, a binding <code>B</code> can have value has type <code>A</code>. <strong>Subtyping</strong> was wildly used in many class-based languages, but it also brings new problem when working with <strong>Ad-hoc</strong>. For example: <code>f : B -&gt; B</code> usually can apply with <code>f (a : A)</code> when has <strong>subtyping</strong>, however, if we also have overloading function <code>f : A -&gt; B</code>? We have three choices here:</p>
+<ol>
+<li>use <code>A -&gt; B</code></li>
+<li>use <code>B -&gt; B</code></li>
+<li>report conflict error</li>
+</ol>
+<p>All of them are fine, it depends on which one you tend to have, this is just trade off.</p>
 <h1><a class="header" href="#parser" id="parser">Parser</a></h1>
 <p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
 but practical language usually didn't need the complex techiology. But at here I still would list the common tools
