@@ -167,7 +167,37 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#parametric-polymorphism" id="parametric-polymorphism">Parametric polymorphism</a></h1>
-<p><strong>Parametric polymorphism</strong> is generic.</p>
+<p><strong>Parametric polymorphism</strong> also known as generic, it provides ability to abstract a type, in <strong>STLC</strong> we have abstraction which looks like \( \lambda x : T .M \). If <code>x</code> is a type? We usually use <code>*</code> for type of type. Now we get \( \lambda x : * .M \), an abstraction of a type. For example, <code>List&lt;T&gt;</code> is a function <code>List : (T : *) -&gt; *</code>.</p>
+<p>From implementation perspective, we have two solutions:</p>
+<ol>
+<li>dynamic</li>
+<li>generate</li>
+</ol>
+<p><strong>Dynamic</strong> is the simple one for code generation, from C perspective it might just a <code>void *</code>, thus</p>
+<pre><code class="language-c">struct Node&lt;T&gt; {
+    Node&lt;T&gt; *prev;
+    T value;
+}
+</code></pre>
+<p>would be:</p>
+<pre><code class="language-c">struct Node {
+    Node *prev;
+    void *value;
+}
+</code></pre>
+<p><strong>Generate</strong> is hard one, but can get better performance, still the same <code>Node&lt;T&gt;</code>, we generate <code>Node&lt;i64&gt;</code> to:</p>
+<pre><code class="language-c">struct Node_i64 {
+    Node_i64 *prev;
+    i64 value;
+}
+</code></pre>
+<p><code>Node_f64</code> to:</p>
+<pre><code class="language-c">struct Node_f64 {
+    Node_f64 *prev;
+    f64 value;
+}
+</code></pre>
+<p>However, problem of <strong>Generate</strong> method is obviously, it produces larger binary, and the performance issue of <strong>Dynamic</strong> method can be solved by JIT.</p>
 
                     </main>
 
