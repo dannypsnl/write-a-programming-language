@@ -11,6 +11,13 @@
   - [Chapter 4-1: Ad-hoc polymorphism](./ch4/ad-hoc-poly.md)
   - [Chapter 4-2: Parametric polymorphism](./ch4/parametric-poly.md)
   - [Chapter 4-3: Subtyping](./ch4/subtyping.md)
+- [Chapter 5: Complicated Inference](./chapter_5.md)
+- [Chapter 6: row polymorphism](./chapter_6.md)
+- dependent type
+  - Curry-Howard correspondence
+  - lambda cube
+- substructural type
+- refinement type
 
 # Appendix
 

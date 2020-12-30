@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 1: Type Checking - Write You a Programming Language</title>
+        <title>Chapter 5: Complicated Inference - Write You a Programming Language</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html" class="active"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">7.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html" class="active"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">7.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,39 +166,28 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#type-checking" id="type-checking">Type Checking</a></h1>
-<p>Without type checking, program still works. Oh! Then why type checking? They spent times, right? Yes, type checking use more resource if we <strong>always</strong> make correct software. Unfortunately, we don't. For example, we might exceptionally write:</p>
-<pre><code class="language-racket">(string-append &quot;hello, &quot; 1)
+                        <h1><a class="header" href="#complicated-inference" id="complicated-inference">Complicated Inference</a></h1>
+<p>A problem would come when we move into more complicate type system: can we avoid type mark but still get benefit from type system? The answer is no for <strong>polymorphic lambda calculus(also known as system F)</strong>, for example</p>
+<pre><code class="language-racket">(λ (f) (f 1))
 </code></pre>
-<p>That's ridiculous, but if <code>(define (hello name) (string-append &quot;hello, &quot; name))</code>? The previous program can happen, when we didn't write:</p>
-<pre><code class="language-racket">(define (hello name)
-  (when (string? name)
-    (string-append &quot;hello, &quot; name)))
+<p>we know <code>1</code> has type <code>Number</code>, but what's the result type of <code>f</code>? At most, we can get <code>f : Number -&gt; ?</code>, but nothing more. Thus, the inference on <strong>system F</strong> is not decidable. However, the following code would work:</p>
+<pre><code class="language-racket">((λ (f) (f 1)) (λ (x) x))
 </code></pre>
-<p>This time we always have a string, ignores others, but maybe we would like to know this function failed?</p>
-<pre><code class="language-racket">(define (hello name)
-  (if (string? name)
-    (string-append &quot;hello, &quot; name)
-    (error 'hello &quot;name should be a string!&quot;)))
-</code></pre>
-<p>Or, we can just check it when compiling?</p>
-<pre><code class="language-racket">(define (hello [name : String])
-  (string-append &quot;hello, &quot; name))
-</code></pre>
-<p>This is correct answer, if we only care about the runtime speed, more type(information), better output was possible. Unfortunately, from another perspective, compile time can be hurt. Runtime performance is not the only consideration, what does this mean? In language like <strong>Coq</strong>, <strong>Agda</strong>, proof a list has expected length in compile time is possible, but they might take a crazy long time to compile a small program. Simpler languages like <strong>Rust</strong>, <strong>Haskell</strong>, still known as having slow compiler, solve more problems in compile time make compile time longer. Designing language, means make a balance between these choose(include but not just compile time problem).</p>
+<p>We get <code>f : a -&gt; a</code> from <code>(λ (x) x)</code>, then <code>a = Number</code> when apply <code>f</code> with <code>1</code>, hence <code>((λ (f) (f 1)) (λ (x) x)) : Number</code>. The most important observe here is: if we can detect the implementation of a binding, then inference is decidable. Thus, <strong>Hindley-Milner type system</strong> introduces <strong>let binding</strong> into the system, which gives a such form.</p>
+<p>TODO</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="ch4/subtyping.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="chapter_2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="appendix_parser.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -210,13 +199,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="ch4/subtyping.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="chapter_2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="appendix_parser.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
