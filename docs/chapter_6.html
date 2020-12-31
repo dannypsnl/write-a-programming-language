@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Chapter 2: Type Inference - Write You a Programming Language</title>
+        <title>Chapter 6: row polymorphism - Write You a Programming Language</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html" class="active"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">7.</strong> Chapter 6: row polymorphism</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">8.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded "><a href="chapter_6.html" class="active"><strong aria-hidden="true">7.</strong> Chapter 6: row polymorphism</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">8.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,37 +166,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#type-inference" id="type-inference">Type Inference</a></h1>
-<p>With type, we need to define all our variable like the following code:</p>
-<pre><code class="language-racket">(define i : Number 1)
-(define b : Bool #t)
-(define c : Char #\c)
-</code></pre>
-<p>Annoying, we know what is <code>1</code>, <code>#t</code>, and <code>#\c</code>. Since we have knowledge, we can create a compiler find types for you:</p>
-<pre><code class="language-racket">(define (infer-type exp)
-  (cond
-    [(number? exp) 'Number]
-    [(boolean? exp) 'Bool]
-    [(char? exp) 'Char]))
-</code></pre>
-<p>Then we only have to write:</p>
-<pre><code class="language-racket">(define i 1)
-(define b #t)
-(define c #\c)
-</code></pre>
+                        <h1><a class="header" href="#row-polymorphism" id="row-polymorphism">row polymorphism</a></h1>
+<p>Row polymorphism helps us get <strong>a structure only when it with expected properties</strong>. For example, we can have a function type: <code>{a : A, rest : ...} -&gt; {a : A}</code>, where <code>{a = A()}</code>, <code>{a = A(), b = B(), c = C()}</code>, and <code>{a = A(), b = B()}</code> are all valid argument, but <code>{a = B()}</code>, <code>{b = B()}</code>, and <code>{b = B(), c = C()}</code> are not.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="chapter_1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="chapter_5.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="chapter_3.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="appendix_parser.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -208,13 +192,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="chapter_1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="chapter_5.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="chapter_3.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="appendix_parser.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

@@ -13,11 +13,16 @@
   - [Chapter 4-3: Subtyping](./ch4/subtyping.md)
 - [Chapter 5: Complicated Inference](./chapter_5.md)
 - [Chapter 6: row polymorphism](./chapter_6.md)
-- dependent type
-  - Curry-Howard correspondence
-  - lambda cube
-- substructural type
-- refinement type
+
+[comment]: <> (- dependent type)
+
+[comment]: <> ( - Curry-Howard correspondence)
+
+[comment]: <> ( - lambda cube)
+
+[comment]: <> (- substructural type)
+
+[comment]: <> (- refinement type)
 
 # Appendix
 
