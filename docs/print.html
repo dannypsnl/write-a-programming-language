@@ -218,7 +218,12 @@
 <p>With two types: <strong>Base type</strong> and <strong>Arrow type</strong>, <strong>lambda calculus</strong> became <strong>Simply typed lambda calculus(STLC)</strong>, the most important property of <strong>STLC</strong> was strong normalization, which means it produces type for all terms.</p>
 <p><strong>STLC</strong> puts type rules in to system, where points out an abstraction \( \lambda x : A.M \) has type \( A \to B \) if \( M \) has type \( B \), and application \( M \ N \) get type \( B \) if \(M\) has type \(A \to B\) and \(N\) has type \(A\).</p>
 <h1><a class="header" href="#polymorphism--advanced-type-inference" id="polymorphism--advanced-type-inference">Polymorphism &amp; Advanced Type Inference</a></h1>
-<p>Polymorphism has <strong>Ad-hoc polymorphism</strong>, <strong>Parametric polymorphism</strong>, and <strong>Subtyping</strong>.</p>
+<p>Polymorphism is all about how to handle more generally input via some constraints. Here we are going to talk about</p>
+<ul>
+<li><a href="./ch4/ad-hoc-poly.html">Chapter 4-1: Ad-hoc polymorphism</a></li>
+<li><a href="./ch4/parametric-poly.html">Chapter 4-2: Parametric polymorphism</a></li>
+<li><a href="./ch4/subtyping.html">Chapter 4-3: Subtyping</a></li>
+</ul>
 <h1><a class="header" href="#ad-hoc-polymorphism" id="ad-hoc-polymorphism">Ad-hoc polymorphism</a></h1>
 <p><strong>Ad-hoc</strong> is overloading, in Haskell we call it <code>class</code>, in Java we have overload function, there has no different down to the core. This feature allows a function definition works with different type. Two concrete approaches(Haskell and Java style) looks different at first:</p>
 <ul>
