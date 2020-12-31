@@ -306,14 +306,118 @@ int count(Human h) { return h.getAge(); }
 <h1><a class="header" href="#row-polymorphism" id="row-polymorphism">row polymorphism</a></h1>
 <p>Row polymorphism helps us get <strong>a structure only when it with expected properties</strong>. For example, we can have a function type: <code>{a : A, rest : ...} -&gt; {a : A}</code>, where <code>{a = A()}</code>, <code>{a = A(), b = B(), c = C()}</code>, and <code>{a = A(), b = B()}</code> are all valid argument, but <code>{a = B()}</code>, <code>{b = B()}</code>, and <code>{b = B(), c = C()}</code> are not.</p>
 <h1><a class="header" href="#complicated-inference" id="complicated-inference">Complicated Inference</a></h1>
-<p>A problem would come when we move into more complicate type system: can we avoid type mark but still get benefit from type system? The answer is no for <strong>polymorphic lambda calculus(also known as system F)</strong>, for example</p>
+<p>A problem would come when we move into a more complicate type system since our type just getting more and more horrible now. <strong>Can we avoid type mark but still get benefit from type system?</strong> The answer is no for <strong>polymorphic lambda calculus(also known as system F)</strong>, for example</p>
 <pre><code class="language-racket">(λ (f) (f 1))
 </code></pre>
 <p>we know <code>1</code> has type <code>Number</code>, but what's the result type of <code>f</code>? At most, we can get <code>f : Number -&gt; ?</code>, but nothing more. Thus, the inference on <strong>system F</strong> is not decidable. However, the following code would work:</p>
 <pre><code class="language-racket">((λ (f) (f 1)) (λ (x) x))
 </code></pre>
 <p>We get <code>f : a -&gt; a</code> from <code>(λ (x) x)</code>, then <code>a = Number</code> when apply <code>f</code> with <code>1</code>, hence <code>((λ (f) (f 1)) (λ (x) x)) : Number</code>. The most important observe here is: if we can detect the implementation of a binding, then inference is decidable. Thus, <strong>Hindley-Milner type system</strong> introduces <strong>let binding</strong> into the system, which gives a such form.</p>
-<p>TODO</p>
+<h3><a class="header" href="#implementation" id="implementation">Implementation</a></h3>
+<p>The first part is about syntax <code>recur-infer</code> build type by traveling on the syntax tree, we give any unknown type a tag(free variable type) to keep who they're, such tag is encoding by a <code>procedure</code> for <strong>GEN</strong> and <strong>INST</strong> rule, and a <code>parameter</code> for <strong>Free</strong>. A binding must use <strong>INST</strong> rule to generate a clean new type instance, for example:</p>
+<pre><code class="language-racket">(let ([id (λ (x) x)])
+  (pair (id 1) (id &quot;&quot;)))
+</code></pre>
+<p><code>id</code> must need to be instantiated before using, else we would see <code>error: cannot unify number and string</code> since <code>id</code> unify its free variable with <code>number</code> first, then unify with <code>string</code> but sharing a same instance.</p>
+<pre><code class="language-racket">(define (recur-infer tm [env (make-immutable-hash)])
+  (match tm
+</code></pre>
+<ul>
+<li>
+<p>Lambda rule is simple, a <code>(-&gt; (parameter-type* ...) return-type)</code>, but we didn't know the type of parameter, therefore, given <code>?0</code>, <code>?1</code>, <code>?2</code> and so on. Then create a new environment to infer its body.</p>
+<pre><code class="language-racket">    [`(λ (,x* ...) ,t)
+     (let ([λ-env (foldl (λ (x e)
+                           (extend/env e x (make-parameter (gensym '?))))
+                         env x*)])
+       `(-&gt; ,(map (λ (x) (recur-infer x λ-env)) x*)
+            ,(recur-infer t λ-env)))]
+</code></pre>
+</li>
+<li>
+<p>let rule, which seems like not need, is quite important. In Racket, a possible transformation is <code>let</code> to <code>lambda</code>, however, in HM system they are different as we say above. However, notice that we can make a trick: <strong>bind the inferred type to abstraction's parameter if it's an immediate application</strong>. Another way is introducing make polymorphism type can in the definition of parameter.</p>
+<pre><code class="language-racket">    [`(let ([,x* ,xt*] ...) ,t)
+     (let ([let-env (foldl (λ (x t e)
+                             (extend/env e x
+                                         (λ () (recur-infer t e))))
+                           env x* xt*)])
+       (recur-infer t let-env))]
+</code></pre>
+</li>
+<li>
+<p><code>list</code> are something like <code>'(1 2 3)</code>, <code>pair</code> are <code>(pair 1 2)</code>. In these cases, we return <code>(&lt;list or pair&gt; ?)</code> if no elements, we will not sure what's <code>?</code>(use <code>(make-parameter (gensym))</code>) till we get some operations like: <code>(append a-list 1)</code> then infer <code>?</code> via application rule. If there have elements, we infer via first element, and check rest elements!</p>
+<pre><code class="language-racket">    [`(pair ,a ,b)
+     `(pair ,(recur-infer a env) ,(recur-infer b env))]
+    [`(quote ,p*)
+     `(list ,(if (empty? p*)
+                 (make-parameter (gensym '?))
+                 (let ([et (recur-infer (car p*) env)])
+                   (for-each (λ (et*) (unify et* et))
+                             (map (λ (x) (recur-infer x env)) (cdr p*)))
+                   et)))]
+</code></pre>
+</li>
+<li>
+<p>Application rule unify the <code>f</code> type with a new arrow(<code>-&gt;</code>) type which constructed by arguments' type, and a free type variable for return type. Then give final return type as its result.</p>
+<pre><code class="language-racket">    [`(,f ,arg* ...)
+     (let ([free (make-parameter (gensym '?))])
+       (unify (recur-infer f env)
+              `(-&gt; ,(map (λ (arg) (recur-infer arg env)) arg*) ,free))
+       free)]
+</code></pre>
+</li>
+<li>
+<p>Finally, we get some simple type(monolithic)</p>
+<pre><code class="language-racket">    [x (cond
+         [(string? x) 'string]
+         [(number? x) 'number]
+         [(char? x) 'char]
+         [(symbol? x)
+          (let ([t (lookup/type-of env x)])
+            (if (and (procedure? t) (not (parameter? t)))
+                (t)
+                t))]
+         [else (error (format &quot;unknown form: ~a&quot; x))])]))
+</code></pre>
+</li>
+</ul>
+<p>Above program separate and explain how the key part working, in the last step, once we get all result, we remove all free variable as possible.</p>
+<pre><code class="language-racket">(define (elim-free ty)
+  (match ty
+    [`(,ty* ...)
+     (map elim-free ty*)]
+    [ty (if (parameter? ty)
+            (elim-free (ty))
+            ty)]))
+
+(define (infer tm) (elim-free (recur-infer tm)))
+</code></pre>
+<p>Then here was the key of all the stuff: <code>occurs</code> and <code>unify</code>, <strong>unification</strong> is all about binding variable with any order. Thus, <code>(unify ?a int)</code> and <code>(unify int ?a)</code> should produce same result and make <code>?a</code> be <code>int</code>, and we also believe <code>?a</code> cannot unify with <code>string</code> again since its <code>int</code> and <code>int</code> is not <code>string</code>. However, unifying <code>?a</code> with <code>?b</code> is an option, it has no different with <code>(unify ?b int)</code> and <code>unify ?b ?a</code>. The last thing we need to be careful was recursion, consider if we <code>(unify ?a (list ?a))</code>, our process would run into trouble: <code>?a</code> is <code>(list ?a)</code>, but what's <code>(list ?a)</code>? We expand <code>?a</code> then get <code>(list (list ?a))</code>, but then what's <code>?a</code>? Again and again... Thus, we must check <code>?a</code> didn't occur in the type which it's going to bind.</p>
+<pre><code class="language-racket">(define (occurs v t)
+  (match t
+    [`(,t* ...)
+     (ormap (λ (t) (occurs v t)) t*)]
+    (t (equal? v t))))
+
+(define (unify t1 t2)
+  (match* (t1 t2)
+    [(_ t2) #:when (and (parameter? t2)
+                        ;;; ensure t2 is still free
+                        (string-prefix? (symbol-&gt;string (t2)) &quot;?&quot;))
+            (when (or (eqv? t1 (t2)) (occurs (t2) t1))
+              (error (format &quot;~a occurs in ~a&quot; (t2) t1)))
+            (t2 t1)]
+    [(t1 _) #:when (parameter? t1)
+            (unify t2 t1)]
+    [(`(,a* ...) `(,b* ...))
+     (for-each unify a* b*)]
+    [(_ _)
+     (let ([a (elim-free t1)]
+           [b (elim-free t2)])
+       (unless (eqv? a b)
+         (error (format &quot;cannot unify type ~a and ~a&quot; a b))))]))
+</code></pre>
+<h3><a class="header" href="#more" id="more">More</a></h3>
+<p>Though I said rebound is unacceptable, in fact we can make several variants of type systems on this, by introducing one of <strong>union type</strong>, <strong>higher rank type</strong>, <strong>row polymorphism</strong>, we can get lots of fun. <strong>Hindley-Milner type system</strong> is not a good system in practice what we already know, even <strong>Haskell</strong> best practice would tell you at least give the top level binding a type annotation. However, the core of <strong>Hindley-Milner type system</strong>, unification was really important in the more advanced type system like <strong>Dependent type</strong> since we need to deal with a lots of duplicate annotation in these variants.</p>
 <h1><a class="header" href="#parser" id="parser">Parser</a></h1>
 <p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
 but practical language usually didn't need the complex techiology. But at here I still would list the common tools
@@ -787,21 +891,6 @@ parse_expression_1(lhs, min_precedence)
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         
