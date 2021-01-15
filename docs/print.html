@@ -100,7 +100,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li><li class="chapter-item expanded "><a href="ch4/row-poly.html"><strong aria-hidden="true">5.4.</strong> Chapter 4-4: row polymorphism</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">7.</strong> Appendix: parser</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Chapters</li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">2.</strong> Chapter 1: Type Checking</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">3.</strong> Chapter 2: Type Inference</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">4.</strong> Chapter 3: Lambda Calculus</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">5.</strong> Chapter 4: Polymorphism &amp; Advanced Type Inference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch4/ad-hoc-poly.html"><strong aria-hidden="true">5.1.</strong> Chapter 4-1: Ad-hoc polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/parametric-poly.html"><strong aria-hidden="true">5.2.</strong> Chapter 4-2: Parametric polymorphism</a></li><li class="chapter-item expanded "><a href="ch4/subtyping.html"><strong aria-hidden="true">5.3.</strong> Chapter 4-3: Subtyping</a></li><li class="chapter-item expanded "><a href="ch4/row-poly.html"><strong aria-hidden="true">5.4.</strong> Chapter 4-4: row polymorphism</a></li></ol></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">6.</strong> Chapter 5: Complicated Inference</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">7.</strong> Chapter 6: Lambda Cube</a></li><li class="chapter-item expanded "><a href="chapter_7.html"><strong aria-hidden="true">8.</strong> Chapter 7: Dependent Type</a></li><li class="chapter-item expanded "><a href="chapter_8.html"><strong aria-hidden="true">9.</strong> Chapter 8: Curry-Howard Correspondence</a></li><li class="chapter-item expanded "><a href="chapter_9.html"><strong aria-hidden="true">10.</strong> Chapter 9: Substructural Type</a></li><li class="chapter-item expanded "><a href="chapter_10.html"><strong aria-hidden="true">11.</strong> Chapter 10: Refinement Type</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="appendix_parser.html"><strong aria-hidden="true">12.</strong> Appendix: parser</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -418,6 +418,79 @@ int count(Human h) { return h.getAge(); }
 </code></pre>
 <h3><a class="header" href="#more" id="more">More</a></h3>
 <p>Though I said rebound is unacceptable, in fact we can make several variants of type systems on this, by introducing one of <strong>union type</strong>, <strong>higher rank type</strong>, <strong>row polymorphism</strong>, we can get lots of fun. <strong>Hindley-Milner type system</strong> is not a good system in practice what we already know, even <strong>Haskell</strong> best practice would tell you at least give the top level binding a type annotation. However, the core of <strong>Hindley-Milner type system</strong>, unification was really important in the more advanced type system like <strong>Dependent type</strong> since we need to deal with a lots of duplicate annotation in these variants.</p>
+<h1><a class="header" href="#lambda-cube" id="lambda-cube">Lambda Cube</a></h1>
+<p>Lambda Cube, as its name, was a cube. The vertex of cube was type system, each edge shows a change to type system as a direction, and take a type system as source to produce another type system as target.</p>
+<p>Its starts from <strong>STLC</strong>, we have three directions can pick.</p>
+<ol>
+<li>
+<p>polymorphism: \(\lambda 2\)</p>
+<p>Also known as <strong>system F</strong>, this allows terms to depend on types, by the following rule.</p>
+<p>\(
+\frac
+{\Gamma \vdash t : B}
+{\Gamma \vdash \Lambda a.t : \Pi a. B}
+\)</p>
+<p>For example, the following program</p>
+<pre><code class="language-racket">(define (id x) x)
+</code></pre>
+<p>would have a type: <code>?a -&gt; ?a</code>. We can postpone evaluation to get what's <code>?a</code> by unification algorithm. The output of <code>(id k)</code> depends on the type of <code>k</code>.</p>
+</li>
+<li>
+<p>dependent type: \(\lambda Pi\)(lambda Pi or lambda P)</p>
+<p>This system allows <strong>type depends on term</strong>, by the following rule.</p>
+<p>\(
+\frac
+{\Gamma , x : A \vdash B : *}
+{\Gamma \vdash (\Pi x : A . B) : *}
+\)</p>
+<p><code>A : *</code> says <code>A</code> is a type, this rule says:
+when</p>
+<ol>
+<li>In context, <code>x</code> is a <code>A</code></li>
+<li><code>B</code> is a type make sense</li>
+</ol>
+<p>then \(\Pi x : A . B\) is a type in such context.</p>
+</li>
+<li>
+<p>type operator: \(\lambda \omega\)(lambda omega)</p>
+<p>This system provides <strong>type depends on type</strong>, for example: <code>(List A)</code>, <code>(Tree A)</code>.</p>
+</li>
+</ol>
+<p>Combine them we can get</p>
+<ol>
+<li>\(F \omega\)</li>
+<li>\(\lambda \Pi 2\)</li>
+<li>\(\lambda \Pi\omega\)</li>
+</ol>
+<p>and all of them \(\lambda C\), the <strong>calculus of construction</strong> system, in following chapters <strong>dependent type</strong> usually just refer to this system rather than \(\lambda \Pi\).</p>
+<h1><a class="header" href="#dependent-type" id="dependent-type">Dependent Type</a></h1>
+<p>Lambda Cube demonstrate an interesting picture about type theory world, but it just a start, <strong>Calculus of Construction</strong> needs to consider reality to work. We can imagine a function like the following.</p>
+<pre><code class="language-racket">(define (A-or-B [b : Bool] [A B : Type]) : Type
+  (match b
+    [true =&gt; A]
+    [false =&gt; B]))
+</code></pre>
+<p>Obviously,</p>
+<ul>
+<li><code>(A-or-B true Nat Bool)</code> produces <code>Nat</code></li>
+<li><code>(A-or-B false Nat Bool)</code> produces <code>Bool</code></li>
+</ul>
+<p>Thus, we can have definition</p>
+<pre><code class="language-racket">(define a : (A-or-B true Nat Bool)
+  1)
+</code></pre>
+<p>which very make sense.</p>
+<p>Until we found something the following.</p>
+<pre><code class="language-racket">(define (endless [n : Nat]) : Type
+  (match n
+    [zero =&gt; Bool]
+    [(suc ,n) =&gt; (endless (suc n))]))
+</code></pre>
+<ul>
+<li><code>(endless zero)</code> produces <code>Bool</code></li>
+<li>However, <code>(endless (suc n))</code> for any <code>n : Nat</code> produces nothing!</li>
+</ul>
+<p>The computation even won't get stop! Then our type checking just a joke since halting problem is undecidable.</p>
 <h1><a class="header" href="#parser" id="parser">Parser</a></h1>
 <p>I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
 but practical language usually didn't need the complex techiology. But at here I still would list the common tools
@@ -891,6 +964,21 @@ parse_expression_1(lhs, min_precedence)
 
         </div>
 
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         
 
         
