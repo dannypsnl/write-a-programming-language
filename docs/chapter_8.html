@@ -169,8 +169,11 @@
                         <h1><a class="header" href="#curry-howard-correspondence" id="curry-howard-correspondence">Curry-Howard Correspondence</a></h1>
 <p>Curry-Howard correspondence is all about correspondencing between types and logic.</p>
 <ul>
-<li>(\Sigma)</li>
+<li>\(\Sigma\): exists</li>
+<li>\(\Pi\): forall</li>
+<li>\(\rightarrow\): implies</li>
 </ul>
+<p>By this correspondencing, we can write constructive proof by the program.</p>
 
                     </main>
 
@@ -209,6 +212,21 @@
 
         </div>
 
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
         
 
         
