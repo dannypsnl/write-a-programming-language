@@ -6,4 +6,4 @@ Curry-Howard correspondence is all about correspondencing between types and logi
 - \\(\Pi\\): forall
 - \\(\rightarrow\\): implies
 
-By this correspondencing, we can write constructive proof by the program.
+By this correspondence, we can write constructive proof by the program.
