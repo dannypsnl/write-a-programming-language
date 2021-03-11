@@ -16,8 +16,6 @@
 - [Chapter 6: Lambda Cube](./chapter_6.md)
 - [Chapter 7: Dependent Type](./chapter_7.md)
 - [Chapter 8: Curry-Howard Correspondence](./chapter_8.md)
-- [Chapter 9: Substructural Type](./chapter_9.md)
-- [Chapter 10: Refinement Type](./chapter_10.md)
 
 # Appendix
 
