@@ -34,7 +34,7 @@ struct Node_i64 {
 }
 ```
 
-`Node_f64` to:
+`Node<f64>` to:
 
 ```c
 struct Node_f64 {
