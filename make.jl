@@ -1,7 +1,7 @@
 using Documenter
 
 makedocs(
-    sitename = "write-a-programming-language",
+    sitename = "Write you a programming language",
     format = Documenter.HTML(),
     pages = [
         "index.md",
