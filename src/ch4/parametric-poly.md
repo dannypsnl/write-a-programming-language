@@ -1,6 +1,6 @@
 # Parametric polymorphism
 
-**Parametric polymorphism** also known as generic, it provides ability to abstract a type, in **STLC** we have abstraction which looks like \\( \lambda x : T .M \\). If `x` is a type? We usually use `*` for type of type. Now we get \\( \lambda x : \* .M \\), an abstraction of a type. For example, `List<T>` is a function `List : (T : *) -> *`.
+**Parametric polymorphism** also known as generic, it provides ability to abstract a type, in **STLC** we have abstraction which looks like $\lambda x : T .M$. If `x` is a type? We usually use `*` for type of type. Now we get $\lambda x : \* .M$, an abstraction of a type. For example, `List<T>` is a function `List : (T : *) -> *`.
 
 From implementation perspective, we have two solutions:
 

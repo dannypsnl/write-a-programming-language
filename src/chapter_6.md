@@ -4,15 +4,15 @@ Lambda Cube, as its name, was a cube. The vertex of cube was type system, each e
 
 Its starts from **STLC**, we have three directions can pick.
 
-1. polymorphism: \\(\lambda 2\\)
+1. polymorphism: $\lambda 2$
 
    Also known as **system F**, this allows terms to depend on types, by the following rule.
 
-   \\(
+   $$
    \frac
    {\Gamma \vdash t : B}
    {\Gamma \vdash \Lambda a.t : \Pi a. B}
-   \\)
+   $$
 
    For example, the following program
 
@@ -26,11 +26,11 @@ Its starts from **STLC**, we have three directions can pick.
 
    This system allows **type depends on term**, by the following rule.
 
-   \\(
+   $$
    \frac
    {\Gamma , x : A \vdash B : \*}
    {\Gamma \vdash (\Pi x : A . B) : \*}
-   \\)
+   $$
 
    `A : *` says `A` is a type, this rule says:
    when
@@ -38,16 +38,16 @@ Its starts from **STLC**, we have three directions can pick.
    1. In context, `x` is a `A`
    2. `B` is a type make sense
 
-   then \\(\Pi x : A . B\\) is a type in such context.
+   then $\Pi x : A . B$ is a type in such context.
 
-3. type operator: \\(\lambda \omega\\)(lambda omega)
+3. type operator: $\lambda \omega$(lambda omega)
 
    This system provides **type depends on type**, for example: `(List A)`, `(Tree A)`.
 
 Combine them we can get
 
-1. \\(F \omega\\)
-2. \\(\lambda \Pi 2\\)
-3. \\(\lambda \Pi\omega\\)
+1. $F \omega$
+2. $\lambda \Pi 2$
+3. $\lambda \Pi\omega$
 
-and all of them \\(\lambda C\\), the **calculus of construction** system, in following chapters **dependent type** usually just refer to this system rather than \\(\lambda \Pi\\).
+and all of them $\lambda C$, the **calculus of construction** system, in following chapters **dependent type** usually just refer to this system rather than $\lambda \Pi$.
