@@ -2,7 +2,7 @@ name: Publish docs via GitHub Pages
 
 on:
   push:
-    branches: [master]
+    branches: [develop]
     paths: ["**publish.yml", "**.jl", "**.md"]
   pull_request:
     branches: ["*"]
