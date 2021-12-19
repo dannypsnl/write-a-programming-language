@@ -1,5 +1,7 @@
 # Write you a programming language
 
+This repository puts a collection of books to help you learn how to build a programming language from design side, and realize why we shouldn't(in most of time)!
+
 ### License
 
 <img src="http://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png" width="140" alt="Artwork CC BY NC SA" />
