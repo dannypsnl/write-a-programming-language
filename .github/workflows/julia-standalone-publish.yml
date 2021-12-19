@@ -1,0 +1,35 @@
+name: Publish docs via GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths: ["**publish.yml", "**.jl", "**.md"]
+  pull_request:
+    branches: ["*"]
+    paths: ["**.jl", "**.md"]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: "1"
+      - run: |
+          julia --project=. -e '
+            using Pkg
+            Pkg.instantiate()'
+      - run: julia --project=. make.jl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build
+          publish_branch: gh-pages
