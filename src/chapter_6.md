@@ -1,4 +1,4 @@
-# Lambda Cube
+# Chapter 6: Lambda Cube
 
 Lambda Cube, as its name, was a cube. The vertex of cube was type system, each edge shows a change to type system as a direction, and take a type system as source to produce another type system as target.
 

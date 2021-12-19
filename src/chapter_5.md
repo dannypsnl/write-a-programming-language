@@ -1,4 +1,4 @@
-# Complicated Inference
+# Chapter 5: Complicated Inference
 
 A problem would come when we move into a more complicate type system since our type just getting more and more horrible now. **Can we avoid type mark but still get benefit from type system?** The answer is no for **polymorphic lambda calculus(also known as system F)**, for example
 

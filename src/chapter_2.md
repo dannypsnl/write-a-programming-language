@@ -1,4 +1,4 @@
-# Type Inference
+# Chapter 2: Type Inference
 
 With type, we need to define all our variable like the following code:
 

@@ -1,4 +1,4 @@
-# Type Checking
+# Chapter 1: Type Checking
 
 Without type checking, program still works. Oh! Then why type checking? They spent times, right? Yes, type checking use more resource if we **always** make correct software. Unfortunately, we don't. For example, we might exceptionally write:
 

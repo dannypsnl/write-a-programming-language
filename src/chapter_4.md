@@ -1,4 +1,4 @@
-# Polymorphism & Advanced Type Inference
+# Chapter 4: Polymorphism & Advanced Type Inference
 
 Polymorphism is all about how to handle more generally input via some constraints. Here we are going to talk about
 
