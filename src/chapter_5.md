@@ -2,13 +2,13 @@
 
 A problem would come when we move into a more complicate type system since our type just getting more and more horrible now. **Can we avoid type mark but still get benefit from type system?** The answer is no for **polymorphic lambda calculus(also known as system F)**, for example
 
-```racket
+```scheme
 (λ (f) (f 1))
 ```
 
 we know `1` has type `Number`, but what's the result type of `f`? At most, we can get `f : Number -> ?`, but nothing more. Thus, the inference on **system F** is not decidable. However, the following code would work:
 
-```racket
+```scheme
 ((λ (f) (f 1)) (λ (x) x))
 ```
 
@@ -18,21 +18,21 @@ We get `f : a -> a` from `(λ (x) x)`, then `a = Number` when apply `f` with `1`
 
 The first part is about syntax `recur-infer` build type by traveling on the syntax tree, we give any unknown type a tag(free variable type) to keep who they're, such tag is encoding by a `procedure` for **GEN** and **INST** rule, and a `parameter` for **Free**. A binding must use **INST** rule to generate a clean new type instance, for example:
 
-```racket
+```scheme
 (let ([id (λ (x) x)])
   (pair (id 1) (id "")))
 ```
 
 `id` must need to be instantiated before using, else we would see `error: cannot unify number and string` since `id` unify its free variable with `number` first, then unify with `string` but sharing a same instance.
 
-```racket
+```scheme
 (define (recur-infer tm [env (make-immutable-hash)])
   (match tm
 ```
 
 - Lambda rule is simple, a `(-> (parameter-type* ...) return-type)`, but we didn't know the type of parameter, therefore, given `?0`, `?1`, `?2` and so on. Then create a new environment to infer its body.
 
-  ```racket
+  ```scheme
       [`(λ (,x* ...) ,t)
        (let ([λ-env (foldl (λ (x e)
                              (extend/env e x (make-parameter (gensym '?))))
@@ -43,7 +43,7 @@ The first part is about syntax `recur-infer` build type by traveling on the synt
 
 - let rule, which seems like not need, is quite important. In Racket, a possible transformation is `let` to `lambda`, however, in HM system they are different as we say above. However, notice that we can make a trick: **bind the inferred type to abstraction's parameter if it's an immediate application**. Another way is introducing make polymorphism type can in the definition of parameter.
 
-  ```racket
+  ```scheme
       [`(let ([,x* ,xt*] ...) ,t)
        (let ([let-env (foldl (λ (x t e)
                                (extend/env e x
@@ -54,7 +54,7 @@ The first part is about syntax `recur-infer` build type by traveling on the synt
 
 - `list` are something like `'(1 2 3)`, `pair` are `(pair 1 2)`. In these cases, we return `(<list or pair> ?)` if no elements, we will not sure what's `?`(use `(make-parameter (gensym))`) till we get some operations like: `(append a-list 1)` then infer `?` via application rule. If there have elements, we infer via first element, and check rest elements!
 
-  ```racket
+  ```scheme
       [`(pair ,a ,b)
        `(pair ,(recur-infer a env) ,(recur-infer b env))]
       [`(quote ,p*)
@@ -68,7 +68,7 @@ The first part is about syntax `recur-infer` build type by traveling on the synt
 
 - Application rule unify the `f` type with a new arrow(`->`) type which constructed by arguments' type, and a free type variable for return type. Then give final return type as its result.
 
-  ```racket
+  ```scheme
       [`(,f ,arg* ...)
        (let ([free (make-parameter (gensym '?))])
          (unify (recur-infer f env)
@@ -78,7 +78,7 @@ The first part is about syntax `recur-infer` build type by traveling on the synt
 
 - Finally, we get some simple type(monolithic)
 
-  ```racket
+  ```scheme
       [x (cond
            [(string? x) 'string]
            [(number? x) 'number]
@@ -93,7 +93,7 @@ The first part is about syntax `recur-infer` build type by traveling on the synt
 
 Above program separate and explain how the key part working, in the last step, once we get all result, we remove all free variable as possible.
 
-```racket
+```scheme
 (define (elim-free ty)
   (match ty
     [`(,ty* ...)
@@ -107,7 +107,7 @@ Above program separate and explain how the key part working, in the last step, o
 
 Then here was the key of all the stuff: `occurs` and `unify`, **unification** is all about binding variable with any order. Thus, `(unify ?a int)` and `(unify int ?a)` should produce same result and make `?a` be `int`, and we also believe `?a` cannot unify with `string` again since its `int` and `int` is not `string`. However, unifying `?a` with `?b` is an option, it has no different with `(unify ?b int)` and `unify ?b ?a`. The last thing we need to be careful was recursion, consider if we `(unify ?a (list ?a))`, our process would run into trouble: `?a` is `(list ?a)`, but what's `(list ?a)`? We expand `?a` then get `(list (list ?a))`, but then what's `?a`? Again and again... Thus, we must check `?a` didn't occur in the type which it's going to bind.
 
-```racket
+```scheme
 (define (occurs v t)
   (match t
     [`(,t* ...)

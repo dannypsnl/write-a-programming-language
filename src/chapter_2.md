@@ -2,7 +2,7 @@
 
 With type, we need to define all our variable like the following code:
 
-```racket
+```scheme
 (define i : Number 1)
 (define b : Bool #t)
 (define c : Char #\c)
@@ -10,7 +10,7 @@ With type, we need to define all our variable like the following code:
 
 Annoying, we know what is `1`, `#t`, and `#\c`. Since we have knowledge, we can create a compiler find types for you:
 
-```racket
+```scheme
 (define (infer-type exp)
   (cond
     [(number? exp) 'Number]
@@ -20,7 +20,7 @@ Annoying, we know what is `1`, `#t`, and `#\c`. Since we have knowledge, we can 
 
 Then we only have to write:
 
-```racket
+```scheme
 (define i 1)
 (define b #t)
 (define c #\c)

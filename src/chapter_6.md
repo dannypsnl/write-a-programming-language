@@ -16,7 +16,7 @@ Its starts from **STLC**, we have three directions can pick.
 
    For example, the following program
 
-   ```racket
+   ```scheme
    (define (id x) x)
    ```
 

@@ -427,7 +427,7 @@ parse_expression_1(lhs, min_precedence)
 
 Finally, my favourite technology is combinator, here is the reason:
 
-```racket
+```scheme
 #lang racket
 
 (require data/monad data/applicative) ;;; raco pkg install functional-lib
@@ -473,7 +473,7 @@ This just show how to parse a C structure definition using Racket combinator lib
 
 Quickly the problem would be how to make operator precedence parsing, because combinator doesn't good at loop directly, however, combinator good at recursive:
 
-```racket
+```scheme
 #lang racket
 
 (require data/monad data/applicative)

@@ -2,13 +2,13 @@
 
 Without type checking, program still works. Oh! Then why type checking? They spent times, right? Yes, type checking use more resource if we **always** make correct software. Unfortunately, we don't. For example, we might exceptionally write:
 
-```racket
+```scheme
 (string-append "hello, " 1)
 ```
 
 That's ridiculous, but if `(define (hello name) (string-append "hello, " name))`? The previous program can happen, when we didn't write:
 
-```racket
+```scheme
 (define (hello name)
   (when (string? name)
     (string-append "hello, " name)))
@@ -16,7 +16,7 @@ That's ridiculous, but if `(define (hello name) (string-append "hello, " name))`
 
 This time we always have a string, ignores others, but maybe we would like to know this function failed?
 
-```racket
+```scheme
 (define (hello name)
   (if (string? name)
     (string-append "hello, " name)
@@ -25,7 +25,7 @@ This time we always have a string, ignores others, but maybe we would like to kn
 
 Or, we can just check it when compiling?
 
-```racket
+```scheme
 (define (hello [name : String])
   (string-append "hello, " name))
 ```
