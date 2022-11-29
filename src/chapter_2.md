@@ -2,26 +2,29 @@
 
 With type, we need to define all our variable like the following code:
 
-```scheme
-(define i : Number 1)
-(define b : Bool #t)
-(define c : Char #\c)
+```haskell
+i :: Integer
+i = 1
+
+b :: Boolean
+b = True
+
+c :: Char
+c = 'c'
 ```
 
-Annoying, we know what is `1`, `#t`, and `#\c`. Since we have knowledge, we can create a compiler find types for you:
+This is annoying since we can see the type from primitive terms! Which means it's ok to rewrite above as the following, if your language supports type inference!
 
-```scheme
-(define (infer-type exp)
-  (cond
-    [(number? exp) 'Number]
-    [(boolean? exp) 'Bool]
-    [(char? exp) 'Char]))
+```haskell
+i = 1
+b = True
+c = 'c'
 ```
 
-Then we only have to write:
-
-```scheme
-(define i 1)
-(define b #t)
-(define c #\c)
+A simple inference function for your language might like
+```haskell
+infer :: Term -> Type
+infer (TmInt _) = TyInt
+infer (TmBool _) = TyBool
+infer (TmChar _) = TyChar
 ```
