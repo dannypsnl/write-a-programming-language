@@ -1,26 +1,29 @@
-# Chapter 5: Complicated Inference
+# Chapter 5: Inference code with polymorphic type
 
-A problem would come when we move into a more complicate type system since our type just getting more and more horrible now. **Can we avoid type mark but still get benefit from type system?** The answer is no for **polymorphic lambda calculus(also known as system F)**, for example
 
-```scheme
-(λ (f) (f 1))
+You already learn type inference concept, but if you keep going, you will find the code in chapter 2 cannot handle many important case. With polymorphism, our type getting more horrible now. Can we avoid most type mark and still get benefit from the type system? The answer is no for **polymorphic lambda calculus(also known as system F)**, for example, the following code cannot have fixed result
+
+```haskell
+\f -> f 1
 ```
 
-we know `1` has type `Number`, but what's the result type of `f`? At most, we can get `f : Number -> ?`, but nothing more. Thus, the inference on **system F** is not decidable. However, the following code would work:
+Let's see how it goes to 
 
-```scheme
-((λ (f) (f 1)) (λ (x) x))
+we know `1` has type `Integer`, but what's the result type of `f`? It can be `f : Integer -> ?`, but if we cannot ensure `?` is what, we are not able to unify `?` with any type. Thus, the inference on **system F** is not decidable. However, the following code is type checked
+
+```haskell
+(\f -> f 1) (\x -> x)
 ```
 
-We get `f : a -> a` from `(λ (x) x)`, then `a = Number` when apply `f` with `1`, hence `((λ (f) (f 1)) (λ (x) x)) : Number`. The most important observe here is: if we can detect the implementation of a binding, then inference is decidable. Thus, **Hindley-Milner type system** introduces **let binding** into the system, which gives a such form.
+We get `f : a -> a` from `\x -> x`, then `a = Integer` when apply `f` with `1`, hence `(\f -> f 1) (\x -> x) : Integer`. The most important observe here is: If we can detect the implementation of an appliable binding, then inference is decidable. Thus, **Hindley-Milner type system** introduces **let binding** into the system, which gives a such form.
 
 ### Implementation
 
 The first part is about syntax `recur-infer` build type by traveling on the syntax tree, we give any unknown type a tag(free variable type) to keep who they're, such tag is encoding by a `procedure` for **GEN** and **INST** rule, and a `parameter` for **Free**. A binding must use **INST** rule to generate a clean new type instance, for example:
 
-```scheme
-(let ([id (λ (x) x)])
-  (pair (id 1) (id "")))
+```haskell
+let id = \x -> x
+in (id 1, id "")
 ```
 
 `id` must need to be instantiated before using, else we would see `error: cannot unify number and string` since `id` unify its free variable with `number` first, then unify with `string` but sharing a same instance.
