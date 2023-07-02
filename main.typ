@@ -5,24 +5,27 @@
 #show: project.with(
   title: "Write you a programming language",
   authors: (
-    "林子篆",
+    "Lîm Tsú-thuàn",
   ),
 )
 
+#set heading(numbering: "1.")
+
 #outline()
 
-= Chapter 1: Introduction
+= Overview
 
-Without type checking, program still works. Then why type checking? The process spent times, right? Yes, type checking uses more resource if we always make correct software. Unfortunately, we don't. For example, we might exceptionally write:
+Originally, I follow most traditional course and trying to tell how to make a programming language from technology view, but I quickly found how wrong this way. Because we already have a lot of language, another bad language is not need. Existed tutorials already enough to help anyone make a compiler, but how to design a good language is a question, you would usually need to read tons of books in PLT(Programming Language Theory) this area, and be carefully to avoid be killed by math. I won't try to say what I made is the best, but giving a lot of independent features, and let readers feel the core concept behind them to help readers make a good design.
 
-```js
-"hello, " ++ 1
-```
+#include "chapter/ch1.typ"
+#include "chapter/ch2.typ"
+#include "chapter/ch3.typ"
+#include "chapter/ch4.typ"
+#include "chapter/ch5.typ"
+#include "chapter/ch6.typ"
+#include "chapter/ch7.typ"
+#include "chapter/ch8.typ"
 
-Who is `1`? That's a bit ridiculous unless we start naming people in number. How about `hello name = "hello, " ++ name`? This program can happen, or we write it again, but with check (in untyped scheme):
+= Appendix
 
-```racket
-(define (hello name)
-  (when (string? name)
-    (string-append "hello, " name)))
-```
+#include "appendix/parser.typ"

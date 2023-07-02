@@ -1,8 +1,8 @@
-# Chapter 7: Dependent Type
+= Chapter 7: Dependent Type
 
 Lambda Cube demonstrate an interesting picture about type theory world, but it just a start, **Calculus of Construction** needs to consider reality to work. We can imagine a function like the following.
 
-```scheme
+```rkt
 (define (A-or-B [b : Bool] [A B : Type]) : Type
   (match b
     [true => A]
@@ -16,7 +16,7 @@ Obviously,
 
 Thus, we can have definition
 
-```scheme
+```rkt
 (define a : (A-or-B true Nat Bool)
   1)
 ```
@@ -25,7 +25,7 @@ which very make sense.
 
 Until we found something the following.
 
-```scheme
+```rkt
 (define (endless [n : Nat]) : Type
   (match n
     [zero => Bool]
@@ -39,11 +39,11 @@ The computation even won't get stop! Then our type checking just a joke since ha
 
 Thus, we need termination check.
 
-### Termination Check
+== Termination Check
 
 The simplest solution was ensuring program could be converted to eliminator, the only weak point was this approach couldn't solve more complicated case but only primitive pattern(only expand one level for all constructors of an inductive type). For example
 
-```scheme
+```rkt
 (define (+ [n m : Nat]) : Nat
   (match n
     [zero => m]

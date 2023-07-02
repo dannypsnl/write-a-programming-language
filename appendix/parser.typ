@@ -1,36 +1,28 @@
-# Parser
+== Appendix A: Parser
 
 I have to say I have no idea why most compiler books spent time on Parser, of course this is really complex topic,
 but practical language usually didn't need the complex techiology. But at here I still would list the common tools
 would be there for developing a Parser.
 
-Before that, we must know why we need the Parser, the Parser was a tool to translate the language in our mind into another
-language to run on certain environment. The most common example was compiler compile the language to assembly, but why
-assembly language? Because the environment in case was OS provide the tool called assembler which can translate assembly
-to machine code which can run on the real machine(or more specific, run by CPU). Or like TypeScript, Elm and GHCJs compile
-the origin language to another high-level language JavaScript.
+Before that, we must know why we need the Parser, the Parser was a tool to translate the language in our mind into another language to run on certain environment. The most common example was compiler compile the language to assembly, but why assembly language? Because the environment in case was OS provide the tool called assembler which can translate assembly to machine code which can run on the real machine(or more specific, run by CPU). Or like TypeScript, Elm and GHCJs compile the origin language to another high-level language JavaScript.
 
-So the point was we would like to run a program, and we would find out how to run it on our target platform. When you learn
-these stuffs, I believe there are many resources keep mention AST. But what's AST? AST was abstract syntax tree, or to be
-honestly, our real language. Sure, the syntax was not language, or at least just the outlooking part. The all important things
-are our mind concept, and the language just a way to express our mind with some trade-off. What trade-off? For example a
-language can write:
+So the point was we would like to run a program, and we would find out how to run it on our target platform. When you learn these stuffs, I believe there are many resources keep mention AST. But what's AST? AST was abstract syntax tree, or to be honestly, our real language. Sure, the syntax was not language, or at least just the outlooking part. The all important things are our mind concept, and the language just a way to express our mind with some trade-off. What trade-off? For example a language can write:
 
-```
+```py
 print hello, world
 ```
 
 Of course was possible, however, would be hard to read in more complex place. So rather than make Compiler handles it, we
 choose to let people(programmer) handles `string`. Now the code became:
 
-```
+```py
 print "hello, world"
 ```
 
 It looks more clear. But the example can be more complex,
 remember currently we are say `print` takes `"hello, world"` to do something, now we extend the example:
 
-```
+```py
 print "hello, " user_input
 ```
 
@@ -40,7 +32,7 @@ We should **print** `hello, <function>` or `hello, Danny`(if user type in `Danny
 In fact, compiler can not do the decision for you, whatever which behavior it picked would make functionality missing.
 Sometimes we are really want to print out the function value. So we introduce parenthesis in case:
 
-```
+```py
 print("hello, ", user_input())
 # or
 print "hello, " (user_input)
@@ -49,13 +41,13 @@ print "hello, " (user_input)
 The first one was picked by C family, and second one was using by ML family, both has cons and pros. We would keep mention
 these issues.
 
-## Simple parser and why we have next section
+=== Simple parser and why we have next section
 
 In this section we would use Perl6 to build a parser. Parser can be generated? Sure, but I do not recommend it in production. But for simple stuff it was fine.
 
 Here we were going to talk about natural number arithmetic syntax which supprts plus: `+`, times(multiple): `*`, minus: `-` and divide: `/`.
 
-```perl6
+```perl
 grammar Calculator {
     token TOP { <calc-op> }
 
@@ -73,7 +65,7 @@ This is a very short syntax, even C lanugage syntax has 954 lines: https://githu
 
 Forget about that, at here code generator was really useful, we can quickly generate the Parser for our purpose. Then we can create an interpreter based on it:
 
-```perl6
+```perl
 class Calculations {
     method TOP              ($/) { make $<calc-op>.made; }
     # if you are not familiar with Perl just like me, notice that `calc-op` mapping to each grammar
@@ -103,7 +95,7 @@ while (Character.isDigit(c)) {
 while (Character.isSpace(c)) {
     c = s.next().charAt(0); // skip whitespace
 }
-if (c == '+') {
+if (c === '+') {
     c = s.next().charAt(0);
 } else {
     throw new SyntaxException("allow + operator only");
@@ -122,11 +114,11 @@ return new BinaryExpression(number, number2, Operator("+"));
 
 This is of course too exaggerated, but can show why handling input stream is not a good idea. That's why we introduce Lexer layer.
 
-## Lexer
+=== Lexer
 
 Lexer is an optional, the correct way to describe it was a helper component, we would need it when the token was trying to reduce the concept we have to consider. If we don't use lexer, when we parsing
 
-```
+```cpp
 class Foo {}
 ```
 
@@ -325,7 +317,7 @@ pub fn lex<T: Into<String>>(file_name: T, source: T) -> Vec<Token> {
 }
 ```
 
-## Manual parser
+=== Manual parser
 
 A manual parser is powerful, but on the other hand it takes a lot of effort. Before you jump into writing a manual parser and never go back again, ensure that parser generator cannot handle your case.
 
@@ -423,11 +415,11 @@ parse_expression_1(lhs, min_precedence)
     return lhs
 ```
 
-## Combinator
+=== Combinator
 
 Finally, my favourite technology is combinator, here is the reason:
 
-```scheme
+```rkt
 #lang racket
 
 (require data/monad data/applicative) ;;; raco pkg install functional-lib
@@ -473,7 +465,7 @@ This just show how to parse a C structure definition using Racket combinator lib
 
 Quickly the problem would be how to make operator precedence parsing, because combinator doesn't good at loop directly, however, combinator good at recursive:
 
-```scheme
+```rkt
 #lang racket
 
 (require data/monad data/applicative)
@@ -519,6 +511,6 @@ Quickly the problem would be how to make operator precedence parsing, because co
 
 The code shows how to define table parser, and it even more simple to extend, all we need to do is just add new operator list into the table.
 
-## Conclusion
+=== Conclusion
 
 Now we already shows all technologies for parsing(at least, what I know), now you can make some simple language by your own, but let me warn you: make a language doesn't easy, make it be runnable is just the first step, you need to make editor plugin(and we can't naively rely on parser I tell you here, since they cannot partially handle syntax), powerful debugger, profiler, and many other things to help people work on this language productively.
