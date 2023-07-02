@@ -1,35 +1,37 @@
-name: Publish docs via GitHub Pages
-
+name: Build Typst document
 on:
-  push:
-    branches: [develop]
-    paths: ["**publish.yml", "**.jl", "**.md"]
-  pull_request:
-    branches: ["*"]
-    paths: ["**.jl", "**.md"]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  - push
+  - workflow_dispatch
+
+permissions:
+  contents: write
 
 jobs:
-  docs:
-    name: Documentation
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Typst
+        uses: lvignoli/typst-action@main
         with:
-          version: "1"
-      - run: |
-          julia --project=. -e '
-            using Pkg
-            Pkg.instantiate()'
-      - run: julia --project=. make.jl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+          source_file: |
+            main.typ
+
+      - name: Upload PDF file
+        uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
-          publish_branch: gh-pages
+          name: PDF
+          path: *.pdf
+
+      - name: Get current date
+        id: date
+        run: echo "DATE=$(date +%Y-%m-%d-%H:%M)" >> $GITHUB_ENV
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref_type == 'tag'
+        with:
+          name: "${{ github.ref_name }} — ${{ env.DATE }}"
+          files: main.pdf
