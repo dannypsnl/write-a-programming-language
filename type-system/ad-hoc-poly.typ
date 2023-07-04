@@ -1,4 +1,4 @@
-== Ad-hoc polymorphism
+=== Ad-hoc polymorphism
 
 *Ad-hoc* can be simply understandsing as overloading (though that's to simple but enough for now), in Haskell you have `class` (not `class` in C++/Java), in Java you have overload function, there has no different down to the core. This feature allows a function definition works with different type. Two concrete approaches(Haskell and Java style) looks different at first:
 

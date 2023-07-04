@@ -1,4 +1,4 @@
-= Chapter 3: Lambda Calculus
+== Foundation: Lambda Calculus
 
 *lambda calculus* created by three rules
 

@@ -1,4 +1,4 @@
-= Chapter 1: Type System
+= Type System
 
 Without type checking, program still works. Then why type checking? The process spent times, right? Yes, type checking uses more resource if we always make correct software. Unfortunately, we don't. For example, we might exceptionally write:
 
@@ -31,3 +31,11 @@ hello name = "hello, " ++ name
 ```
 
 If we only care about the runtime speed, this is the correct answer. With more type(information), better output from compiler was possible. Unfortunately, from another perspective, compile time can be hurt. Runtime performance is not the only consideration in the real world, what does it mean? In language like Coq, Agda, proof a list has expected length in compile time is possible, but they might take a crazy long time to compile a small program. Simpler languages like Rust, Haskell, still known as having slow compiler. More problems to solve, more time need. Designing a language, means make a balance between these choose, include but not just compile time problem.
+
+#include "poly.typ"
+#include "lc.typ"
+#include "inference.typ"
+#include "infer-poly.typ"
+#include "lc-cube.typ"
+#include "dt.typ"
+#include "curry-howard.typ"

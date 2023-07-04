@@ -1,4 +1,4 @@
-= Chapter 6: Lambda Cube
+== Lambda Cube
 
 Lambda Cube, as its name, was a cube. The vertex of cube was type system, each edge shows a change to type system as a direction, and take a type system as source to produce another type system as target.
 
@@ -18,11 +18,11 @@ Its starts from **STLC**, we have three directions can pick.
 
     For example, the following program
 
-    ```scheme
+    ```rkt
     (define (id x) x)
     ```
 
-    would have a type: `?a -> ?a`. We can postpone evaluation to get what's `?a` by unification algorithm. The output of `(id k)` depends on the type of `k`.
+    would have a type: `?a -> ?a` in the system. We can postpone evaluation to get what's `?a` by unification algorithm. The output of `(id k)` depends on the type of `k`.
 
 2. dependent type: $lambda Pi$(lambda Pi or lambda P)
 
@@ -35,9 +35,9 @@ Its starts from **STLC**, we have three directions can pick.
     )
     $
 
-    $A : *$ says $A$ is a type, this rule says: when
+    $A : *$ says $A$ is a type, this rule says: If a context with `x` has type `A` can shows `B` is a type, then $Pi_(x : A) B_x$ is a type in that context.
 
-    If a context with `x` is a `A` can shows `B` is a type, then $Pi_(x : A) B_x$ is a type in that context.
+    $B_x$ is standing for $x$ can occur in $B$
 
 3. type operator: $lambda omega$(lambda omega)
 

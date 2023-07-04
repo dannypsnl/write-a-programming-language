@@ -1,4 +1,4 @@
-= Chapter 7: Dependent Type
+== Dependent Type
 
 Lambda Cube demonstrate an interesting picture about type theory world, but it just a start, **Calculus of Construction** needs to consider reality to work. We can imagine a function like the following.
 
