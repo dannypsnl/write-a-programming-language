@@ -80,7 +80,7 @@ abbrev M := StateT ...
 
 - Finally, we get some simple, builtin type(monolithic)
 
-  ```rkt
+  ```lean
     | .str _ => return strTy
     | .num _ => return numTy
     | .char _ => return charTy
