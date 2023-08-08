@@ -11,7 +11,7 @@
 
 #set heading(numbering: "1.")
 
-#outline()
+#outline(depth: 2)
 
 = Overview
 
